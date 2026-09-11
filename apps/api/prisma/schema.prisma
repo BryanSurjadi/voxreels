@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +5,293 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model Workspace {
+  id            String                @id @default(uuid()) @db.Uuid
+  name          String
+  slug          String                @unique
+  brands        Brand[]
+  projects      Project[]
+  memberships   WorkspaceMembership[]
+  refreshTokens RefreshToken[]
+  mediaAssets   MediaAsset[]
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+}
+
+model Brand {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @db.Uuid
+  name        String
+  slug        String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  projects    Project[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, slug])
+  @@index([workspaceId])
+}
+
+model Project {
+  id                    String          @id @default(uuid()) @db.Uuid
+  workspaceId           String          @db.Uuid
+  brandId               String          @db.Uuid
+  createdById           String?         @db.Uuid
+  name                  String
+  topic                 String?         @db.Text
+  goal                  String?
+  offer                 String?
+  callToAction          String?
+  targetDurationSeconds Int?
+  status                String          @default("draft")
+  workspace             Workspace       @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  brand                 Brand           @relation(fields: [brandId], references: [id], onDelete: Restrict)
+  createdBy             User?           @relation("ProjectCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  scriptVersions        ScriptVersion[]
+  mediaAssets           MediaAsset[]
+  timelines             Timeline[]
+  exports               Export[]
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  @@index([workspaceId])
+  @@index([brandId])
+  @@index([createdById])
+}
+
+enum UserRole {
+  OWNER
+  MEMBER
+}
+
+model User {
+  id              String                @id @default(uuid()) @db.Uuid
+  email           String                @unique
+  displayName     String
+  passwordHash    String
+  memberships     WorkspaceMembership[]
+  refreshTokens   RefreshToken[]
+  projectsCreated Project[]             @relation("ProjectCreator")
+  scriptVersions  ScriptVersion[]       @relation("ScriptVersionCreator")
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+}
+
+model WorkspaceMembership {
+  id          String    @id @default(uuid()) @db.Uuid
+  workspaceId String    @db.Uuid
+  userId      String    @db.Uuid
+  role        UserRole  @default(MEMBER)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+model RefreshToken {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  workspaceId String    @db.Uuid
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  revokedAt   DateTime?
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+
+  @@index([userId])
+  @@index([workspaceId])
+  @@index([expiresAt])
+}
+
+model ScriptVersion {
+  id                 String       @id @default(uuid()) @db.Uuid
+  projectId          String       @db.Uuid
+  createdById        String?      @db.Uuid
+  version            Int
+  origin             String       @default("generated")
+  status             String       @default("draft")
+  content            String       @db.Text
+  model              String?
+  providerResponseId String?      @unique
+  inputTokens        Int?
+  outputTokens       Int?
+  totalTokens        Int?
+  approvedAt         DateTime?
+  project            Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy          User?        @relation("ScriptVersionCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  beats              ScriptBeat[]
+  timelines          Timeline[]
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@unique([projectId, version])
+  @@index([createdById])
+}
+
+model ScriptBeat {
+  id                String           @id @default(uuid()) @db.Uuid
+  scriptVersionId   String           @db.Uuid
+  order             Int
+  role              String?
+  voiceover         String           @db.Text
+  delivery          String?
+  onScreenText      String?          @db.Text
+  visualRequirement String?          @db.Text
+  truthRequirement  String?
+  scriptVersion     ScriptVersion    @relation(fields: [scriptVersionId], references: [id], onDelete: Cascade)
+  voiceTakes        VoiceTake[]
+  mediaLinks        BeatMediaAsset[]
+  timelineItems     TimelineItem[]
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@unique([scriptVersionId, order])
+}
+
+model VoiceTake {
+  id            String         @id @default(uuid()) @db.Uuid
+  scriptBeatId  String         @db.Uuid
+  provider      String
+  model         String
+  providerJobId String?
+  storageKey    String?
+  durationMs    Int?
+  status        String         @default("pending")
+  speed         Float?
+  stability     Float?
+  similarity    Float?
+  style         Float?
+  approvedAt    DateTime?
+  errorMessage  String?        @db.Text
+  scriptBeat    ScriptBeat     @relation(fields: [scriptBeatId], references: [id], onDelete: Cascade)
+  timelineItems TimelineItem[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([scriptBeatId])
+  @@index([providerJobId])
+}
+
+model MediaAsset {
+  id            String           @id @default(uuid()) @db.Uuid
+  workspaceId   String           @db.Uuid
+  projectId     String?          @db.Uuid
+  name          String
+  kind          String
+  sourceType    String
+  status        String           @default("ready")
+  storageKey    String?
+  mimeType      String?
+  durationMs    Int?
+  provider      String?
+  providerJobId String?
+  provenance    String?
+  metadata      Json?
+  workspace     Workspace        @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project       Project?         @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  beatLinks     BeatMediaAsset[]
+  timelineItems TimelineItem[]
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([workspaceId])
+  @@index([projectId])
+  @@index([providerJobId])
+}
+
+model BeatMediaAsset {
+  id           String     @id @default(uuid()) @db.Uuid
+  scriptBeatId String     @db.Uuid
+  mediaAssetId String     @db.Uuid
+  purpose      String?
+  order        Int        @default(0)
+  scriptBeat   ScriptBeat @relation(fields: [scriptBeatId], references: [id], onDelete: Cascade)
+  mediaAsset   MediaAsset @relation(fields: [mediaAssetId], references: [id], onDelete: Cascade)
+  createdAt    DateTime   @default(now())
+
+  @@unique([scriptBeatId, mediaAssetId])
+  @@index([mediaAssetId])
+}
+
+model Timeline {
+  id              String         @id @default(uuid()) @db.Uuid
+  projectId       String         @db.Uuid
+  scriptVersionId String         @db.Uuid
+  version         Int
+  name            String
+  status          String         @default("draft")
+  canvasWidth     Int            @default(1080)
+  canvasHeight    Int            @default(1920)
+  framesPerSecond Int            @default(30)
+  durationMs      Int?
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  scriptVersion   ScriptVersion  @relation(fields: [scriptVersionId], references: [id], onDelete: Restrict)
+  items           TimelineItem[]
+  exports         Export[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@unique([projectId, version])
+  @@index([scriptVersionId])
+}
+
+model TimelineItem {
+  id            String      @id @default(uuid()) @db.Uuid
+  timelineId    String      @db.Uuid
+  scriptBeatId  String?     @db.Uuid
+  mediaAssetId  String?     @db.Uuid
+  voiceTakeId   String?     @db.Uuid
+  trackType     String
+  trackIndex    Int         @default(0)
+  order         Int
+  startMs       Int
+  durationMs    Int
+  trimStartMs   Int         @default(0)
+  trimEndMs     Int?
+  volume        Float       @default(1)
+  positionX     Float       @default(0)
+  positionY     Float       @default(0)
+  scale         Float       @default(1)
+  zIndex        Int         @default(0)
+  transitionIn  String?
+  transitionOut String?
+  text          String?     @db.Text
+  style         Json?
+  timeline      Timeline    @relation(fields: [timelineId], references: [id], onDelete: Cascade)
+  scriptBeat    ScriptBeat? @relation(fields: [scriptBeatId], references: [id], onDelete: SetNull)
+  mediaAsset    MediaAsset? @relation(fields: [mediaAssetId], references: [id], onDelete: SetNull)
+  voiceTake     VoiceTake?  @relation(fields: [voiceTakeId], references: [id], onDelete: SetNull)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([timelineId, trackIndex, order])
+  @@index([scriptBeatId])
+  @@index([mediaAssetId])
+  @@index([voiceTakeId])
+}
+
+model Export {
+  id            String    @id @default(uuid()) @db.Uuid
+  projectId     String    @db.Uuid
+  timelineId    String?   @db.Uuid
+  version       Int
+  type          String
+  status        String    @default("pending")
+  storageKey    String?
+  providerJobId String?
+  metadata      Json?
+  project       Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  timeline      Timeline? @relation(fields: [timelineId], references: [id], onDelete: SetNull)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([projectId, version, type])
+  @@index([timelineId])
+  @@index([providerJobId])
 }

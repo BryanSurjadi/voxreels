@@ -1,29 +1,19 @@
 import "dotenv/config";
+import { app } from "./app.js";
+import { env } from "./config/env.js";
+import { prisma } from "./config/prisma.js";
 
-import cors from "cors";
-import express from "express";
-import helmet from "helmet";
+const server = app.listen(env.PORT, () => {
+  console.log(`VoxReels API running at http://localhost:${env.PORT}`);
+});
 
-const app = express();
-
-const port = Number(process.env.PORT ?? 4000);
-const webOrigin = process.env.WEB_ORIGIN ?? "http://localhost:3000";
-
-app.use(helmet());
-app.use(
-  cors({
-    origin: webOrigin,
-  }),
-);
-app.use(express.json());
-
-app.get("/api/v1/health", (_request, response) => {
-  response.status(200).json({
-    status: "ok",
-    service: "voxreels-api",
+async function shutdown(signal: string) {
+  console.log(`${signal} received; shutting down`);
+  server.close(async () => {
+    await prisma.$disconnect();
+    process.exit(0);
   });
-});
+}
 
-app.listen(port, () => {
-  console.log(`VoxReels API running at http://localhost:${port}`);
-});
+process.on("SIGINT", () => void shutdown("SIGINT"));
+process.on("SIGTERM", () => void shutdown("SIGTERM"));

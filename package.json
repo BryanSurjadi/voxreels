@@ -4,7 +4,6 @@
   "main": "index.js",
   "scripts": {
     "dev": "concurrently \"npm run dev:web\" \"npm run dev:api\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm run build -w apps/api && npm run build -w apps/web",
     "dev:web": "npm run dev -w apps/web",
     "dev:api": "npm run dev -w apps/api"
