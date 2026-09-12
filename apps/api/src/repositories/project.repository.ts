@@ -70,9 +70,9 @@ export function update(
     brandId?: string;
     name?: string;
     topic?: string;
-    goal?: string;
-    offer?: string;
-    callToAction?: string;
+    goal?: string | null;
+    offer?: string | null;
+    callToAction?: string | null;
     targetDurationSeconds?: number;
     status?: string;
   },

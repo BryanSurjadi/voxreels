@@ -1,5 +1,5 @@
 import { prisma } from "../config/prisma.js";
-import type { GeneratedScript } from "../schemas/script.schema.js";
+import type { GeneratedScript, UpdateScriptInput } from "../schemas/script.schema.js";
 
 export function findProject(workspaceId: string, projectId: string) {
   return prisma.project.findFirst({
@@ -47,6 +47,54 @@ export function restoreProjectStatus(
   return prisma.project.updateMany({
     where: { id: projectId, workspaceId, status: "generating_script" },
     data: { status },
+  });
+}
+
+export function findVersion(workspaceId: string, projectId: string, scriptVersionId: string) {
+  return prisma.scriptVersion.findFirst({
+    where: { id: scriptVersionId, projectId, project: { workspaceId } },
+    include: { beats: { orderBy: { order: "asc" } } },
+  });
+}
+
+export function updateVersion(scriptVersionId: string, beats: UpdateScriptInput["beats"]) {
+  return prisma.$transaction(async (transaction) => {
+    for (const beat of beats) {
+      await transaction.scriptBeat.update({
+        where: { id: beat.id, scriptVersionId },
+        data: {
+          voiceover: beat.voiceover,
+          delivery: beat.delivery,
+          onScreenText: beat.onScreenText,
+          visualRequirement: beat.visualRequirement,
+          truthRequirement: beat.truthRequirement,
+        },
+      });
+    }
+
+    const orderedBeats = await transaction.scriptBeat.findMany({
+      where: { scriptVersionId },
+      orderBy: { order: "asc" },
+    });
+    return transaction.scriptVersion.update({
+      where: { id: scriptVersionId },
+      data: { content: orderedBeats.map((beat) => beat.voiceover).join("\n\n") },
+      include: { beats: { orderBy: { order: "asc" } } },
+    });
+  });
+}
+
+export function approveVersion(projectId: string, scriptVersionId: string) {
+  return prisma.$transaction(async (transaction) => {
+    await transaction.scriptVersion.updateMany({
+      where: { projectId, status: "approved", id: { not: scriptVersionId } },
+      data: { status: "draft", approvedAt: null },
+    });
+    return transaction.scriptVersion.update({
+      where: { id: scriptVersionId, projectId },
+      data: { status: "approved", approvedAt: new Date() },
+      include: { beats: { orderBy: { order: "asc" } } },
+    });
   });
 }
 

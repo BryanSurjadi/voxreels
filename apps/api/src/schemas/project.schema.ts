@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const optionalText = (max: number) => z.string().trim().min(1).max(max).optional();
+const nullableText = (max: number) => z.string().trim().max(max).transform((value) => value || null).nullable().optional();
 
 export const projectIdParamsSchema = z.object({
   projectId: z.uuid(),
@@ -20,6 +21,9 @@ export const updateProjectSchema = createProjectSchema
   .omit({ topic: true })
   .extend({
     topic: optionalText(500),
+    goal: nullableText(200),
+    offer: nullableText(200),
+    callToAction: nullableText(200),
     status: z.enum([
       "draft",
       "generating_script",

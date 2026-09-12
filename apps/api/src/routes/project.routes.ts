@@ -25,5 +25,7 @@ projectsRouter.post(
   scriptGenerationLimiter,
   scriptController.generate,
 );
+projectsRouter.patch("/:projectId/scripts/:scriptVersionId", scriptController.update);
+projectsRouter.post("/:projectId/scripts/:scriptVersionId/approve", scriptController.approve);
 projectsRouter.get("/:projectId", projectController.get);
 projectsRouter.patch("/:projectId", projectController.update);
