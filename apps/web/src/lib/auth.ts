@@ -68,7 +68,7 @@ async function refreshAccessToken() {
   }
 }
 
-export async function apiRequest<T>(path: string, init: RequestInit = {}, retry = true): Promise<T> {
+async function authorizedFetch(path: string, init: RequestInit = {}, retry = true): Promise<Response> {
   const token = accessToken ?? (await refreshAccessToken());
   const response = await fetch(`${API_URL}/api/v1${path}`, {
     ...init,
@@ -83,14 +83,29 @@ export async function apiRequest<T>(path: string, init: RequestInit = {}, retry 
   if (response.status === 401 && retry) {
     accessToken = null;
     await refreshAccessToken();
-    return apiRequest<T>(path, init, false);
+    return authorizedFetch(path, init, false);
   }
+
+  return response;
+}
+
+export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
+  const response = await authorizedFetch(path, init);
 
   const payload = (await response.json()) as { data?: T; error?: { message?: string } };
   if (!response.ok || payload.data === undefined) {
     throw new Error(payload.error?.message ?? "The request could not be completed.");
   }
   return payload.data;
+}
+
+export async function apiBlob(path: string) {
+  const response = await authorizedFetch(path);
+  if (!response.ok) {
+    const payload = (await response.json()) as { error?: { message?: string } };
+    throw new Error(payload.error?.message ?? "The media could not be loaded.");
+  }
+  return response.blob();
 }
 
 export async function logout() {

@@ -155,24 +155,26 @@ model ScriptBeat {
 }
 
 model VoiceTake {
-  id            String         @id @default(uuid()) @db.Uuid
-  scriptBeatId  String         @db.Uuid
-  provider      String
-  model         String
-  providerJobId String?
-  storageKey    String?
-  durationMs    Int?
-  status        String         @default("pending")
-  speed         Float?
-  stability     Float?
-  similarity    Float?
-  style         Float?
-  approvedAt    DateTime?
-  errorMessage  String?        @db.Text
-  scriptBeat    ScriptBeat     @relation(fields: [scriptBeatId], references: [id], onDelete: Cascade)
-  timelineItems TimelineItem[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  id             String         @id @default(uuid()) @db.Uuid
+  scriptBeatId   String         @db.Uuid
+  provider       String
+  model          String
+  voiceId        String?
+  characterCount Int?
+  providerJobId  String?
+  storageKey     String?
+  durationMs     Int?
+  status         String         @default("pending")
+  speed          Float?
+  stability      Float?
+  similarity     Float?
+  style          Float?
+  approvedAt     DateTime?
+  errorMessage   String?        @db.Text
+  scriptBeat     ScriptBeat     @relation(fields: [scriptBeatId], references: [id], onDelete: Cascade)
+  timelineItems  TimelineItem[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   @@index([scriptBeatId])
   @@index([providerJobId])

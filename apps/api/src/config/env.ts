@@ -1,6 +1,11 @@
 import "dotenv/config";
 import { z } from "zod";
 
+const optionalString = z.preprocess(
+  (value) => (value === "" ? undefined : value),
+  z.string().min(1).optional(),
+);
+
 const envSchema = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   PORT: z.coerce.number().int().positive().default(4000),
@@ -15,6 +20,10 @@ const envSchema = z.object({
     .default("true")
     .transform((value) => value === "true"),
   OPENAI_API_KEY: z.string().min(1),
+  ELEVENLABS_API_KEY: optionalString,
+  ELEVENLABS_DEFAULT_VOICE_ID: optionalString,
+  ELEVENLABS_MALE_VOICE_ID: optionalString,
+  ELEVENLABS_FEMALE_VOICE_ID: optionalString,
 });
 
 const parsed = envSchema.safeParse(process.env);

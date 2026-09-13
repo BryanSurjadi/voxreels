@@ -35,6 +35,7 @@ export function Dashboard({ initialTopic }: { initialTopic: string }) {
   const [notice, setNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedBrandId, setSelectedBrandId] = useState("");
   const [duration, setDuration] = useState("30");
 
@@ -102,18 +103,22 @@ export function Dashboard({ initialTopic }: { initialTopic: string }) {
 
   return (
     <main className="min-h-screen bg-[#f7f7f5] text-[#0a0a0a] lg:grid lg:grid-cols-[278px_1fr]">
-      <aside className="hidden h-screen border-r border-zinc-200 bg-[#efefed] p-3 lg:sticky lg:top-0 lg:flex lg:flex-col">
-        <Link className="brand px-2 py-3" href="/app" aria-label="VoxReels home">
-          <Image src="/logo-transparent.png" alt="" width={44} height={44} priority />
-          <span>VoxReels</span>
-        </Link>
+      {isSidebarOpen && <button className="fixed inset-0 z-40 bg-black/35 lg:hidden" type="button" aria-label="Close sidebar" onClick={() => setIsSidebarOpen(false)} />}
+      <aside className={`${isSidebarOpen ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 h-screen w-[278px] flex-col border-r border-zinc-200 bg-[#efefed] p-3 lg:sticky lg:top-0 lg:flex`}>
+        <div className="flex items-center justify-between">
+          <Link className="brand px-2 py-3" href="/app" aria-label="VoxReels home" onClick={() => setIsSidebarOpen(false)}>
+            <Image src="/logo-transparent.png" alt="" width={44} height={44} priority />
+            <span>VoxReels</span>
+          </Link>
+          <button className="mr-2 rounded-full p-2 text-xl lg:hidden" type="button" aria-label="Close sidebar" onClick={() => setIsSidebarOpen(false)}>×</button>
+        </div>
 
-        <button className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-black text-sm font-semibold text-white transition hover:bg-zinc-800" type="button" onClick={() => document.getElementById("topic")?.focus()}>
+        <button className="mt-5 flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-black text-sm font-semibold text-white transition hover:bg-zinc-800" type="button" onClick={() => { setIsSidebarOpen(false); document.getElementById("topic")?.focus(); }}>
           <span aria-hidden="true" className="text-lg leading-none">＋</span> New reel
         </button>
 
         <nav className="mt-4 space-y-1 text-sm" aria-label="Workspace">
-          <a className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 font-semibold shadow-sm" href="#create"><span aria-hidden="true">✦</span>Create</a>
+          <a className="flex items-center gap-3 rounded-xl bg-white px-3 py-2.5 font-semibold shadow-sm" href="#create" onClick={() => setIsSidebarOpen(false)}><span aria-hidden="true">✦</span>Create</a>
           <span className="flex cursor-not-allowed items-center gap-3 rounded-xl px-3 py-2.5 text-zinc-400"><span aria-hidden="true">▱</span>Assets <small className="ml-auto">Soon</small></span>
         </nav>
 
@@ -126,7 +131,7 @@ export function Dashboard({ initialTopic }: { initialTopic: string }) {
             {isLoading && <p className="px-3 py-4 text-sm text-zinc-400">Loading workspace…</p>}
             {!isLoading && projects.length === 0 && <p className="px-3 py-4 text-sm leading-5 text-zinc-500">Your generated scripts will appear here.</p>}
             {projects.map((project) => (
-              <Link className="group block w-full rounded-xl px-3 py-2.5 text-left hover:bg-white" href={`/app/projects/${project.id}`} key={project.id}>
+              <Link className="group block w-full rounded-xl px-3 py-2.5 text-left hover:bg-white" href={`/app/projects/${project.id}`} key={project.id} onClick={() => setIsSidebarOpen(false)}>
                 <span className="block truncate text-sm font-medium">{project.name}</span>
                 <span className="mt-1 flex items-center justify-between text-[11px] capitalize text-zinc-400">
                   {statusLabel(project.status)} <i className="h-1.5 w-1.5 rounded-full bg-zinc-300 group-hover:bg-black" />
@@ -150,8 +155,9 @@ export function Dashboard({ initialTopic }: { initialTopic: string }) {
 
       <section className="min-w-0">
         <header className="flex h-16 items-center justify-between border-b border-zinc-200 bg-white/80 px-5 backdrop-blur lg:px-8">
-          <div className="lg:hidden">
-            <Link className="brand" href="/">
+          <div className="flex items-center gap-2 lg:hidden">
+            <button className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-200 bg-white text-lg" type="button" aria-label="Open sidebar" aria-expanded={isSidebarOpen} onClick={() => setIsSidebarOpen(true)}>☰</button>
+            <Link className="brand" href="/app">
               <Image src="/logo-transparent.png" alt="" width={40} height={40} />
               <span>VoxReels</span>
             </Link>

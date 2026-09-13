@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useEffect, useState } from "react";
 import { apiRequest, logout } from "@/lib/auth";
 import { RoundedPicker } from "@/components/rounded-picker";
+import { ProductionWorkspace } from "@/components/production-workspace";
 
 type TruthRequirement =
   | "real_footage_required"
@@ -20,6 +21,8 @@ type ScriptBeat = {
   onScreenText: string | null;
   visualRequirement: string | null;
   truthRequirement: TruthRequirement | null;
+  voiceTakes: Array<{ id: string; status: string; model: string; voiceId: string | null }>;
+  mediaLinks: Array<{ mediaAsset: { id: string; status: string; mimeType: string | null } }>;
 };
 type ScriptVersion = {
   id: string;
@@ -40,6 +43,11 @@ type Project = {
   status: string;
   brand: { id: string; name: string; slug: string };
   scriptVersions: ScriptVersion[];
+  timelines: Array<{
+    id: string;
+    durationMs: number | null;
+    items: Array<{ id: string; trackType: string; trackIndex: number; order: number; startMs: number; durationMs: number }>;
+  }>;
 };
 
 const models = [
@@ -74,6 +82,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
   const [briefDuration, setBriefDuration] = useState("30");
   const [isSavingScript, setIsSavingScript] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   async function refresh() {
     const next = await getProject(projectId);
@@ -268,24 +277,19 @@ export function ProjectReview({ projectId }: { projectId: string }) {
 
   return (
     <main className="min-h-screen bg-[#f7f7f5] text-[#0a0a0a] lg:grid lg:grid-cols-[260px_1fr]">
-      <aside className="hidden h-screen border-r border-zinc-200 bg-[#efefed] p-4 lg:sticky lg:top-0 lg:flex lg:flex-col">
-        <Link
-          className="brand px-1 py-2"
-          href="/app"
-          aria-label="VoxReels home"
-        >
-          <Image
-            src="/logo-transparent.png"
-            alt=""
-            width={44}
-            height={44}
-            priority
-          />
-          <span>VoxReels</span>
-        </Link>
+      {isSidebarOpen && <button className="fixed inset-0 z-40 bg-black/35 lg:hidden" type="button" aria-label="Close sidebar" onClick={() => setIsSidebarOpen(false)} />}
+      <aside className={`${isSidebarOpen ? "flex" : "hidden"} fixed inset-y-0 left-0 z-50 h-screen w-[260px] flex-col border-r border-zinc-200 bg-[#efefed] p-4 lg:sticky lg:top-0 lg:flex`}>
+        <div className="flex items-center justify-between">
+          <Link className="brand px-1 py-2" href="/app" aria-label="VoxReels home" onClick={() => setIsSidebarOpen(false)}>
+            <Image src="/logo-transparent.png" alt="" width={44} height={44} priority />
+            <span>VoxReels</span>
+          </Link>
+          <button className="rounded-full p-2 text-xl lg:hidden" type="button" aria-label="Close sidebar" onClick={() => setIsSidebarOpen(false)}>×</button>
+        </div>
         <Link
           className="mt-7 flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-zinc-600 hover:bg-white hover:text-black"
           href="/app"
+          onClick={() => setIsSidebarOpen(false)}
         >
           ← Back to workspace
         </Link>
@@ -297,8 +301,8 @@ export function ProjectReview({ projectId }: { projectId: string }) {
             {[
               ["1", "Brief", true],
               ["2", "Script", Boolean(script)],
-              ["3", "Voice & visuals", false],
-              ["4", "Editor", false],
+              ["3", "Voice & visuals", approved],
+              ["4", "Editor", project.timelines.length > 0],
             ].map(([number, label, complete]) => (
               <li
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm ${complete ? "bg-white font-semibold text-black" : "text-zinc-400"}`}
@@ -327,11 +331,14 @@ export function ProjectReview({ projectId }: { projectId: string }) {
 
       <section className="min-w-0">
         <header className="flex min-h-16 items-center justify-between border-b border-zinc-200 bg-white/85 px-5 py-3 backdrop-blur sm:px-8">
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-center gap-3">
+            <button className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-lg lg:hidden" type="button" aria-label="Open sidebar" aria-expanded={isSidebarOpen} onClick={() => setIsSidebarOpen(true)}>☰</button>
+            <div className="min-w-0">
             <p className="truncate text-sm font-bold">{project.name}</p>
             <p className="mt-0.5 text-xs text-zinc-400">
               {project.brand.name} · {project.targetDurationSeconds ?? 30}s
             </p>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <span className="rounded-full border border-zinc-200 bg-white px-3 py-1.5 text-xs capitalize text-zinc-500">
@@ -620,7 +627,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
                   </p>
                   <p className="mt-1 text-sm text-zinc-400">
                     {approved
-                      ? "Voice and visual generation is the next stage and is not implemented yet."
+                      ? "The approved words now drive voice, visuals, and the edit timeline below."
                       : "Approval locks this version so later assets use the reviewed text."}
                   </p>
                 </div>
@@ -650,6 +657,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
                   )}
                 </div>
               </div>
+              {approved && <ProductionWorkspace key={project.timelines[0]?.id ?? "production"} project={project} onRefresh={refresh} />}
             </section>
           )}
           {error && (

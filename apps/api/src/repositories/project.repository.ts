@@ -40,10 +40,24 @@ export function findById(workspaceId: string, projectId: string) {
       brand: { select: { id: true, name: true, slug: true } },
       scriptVersions: {
         orderBy: { version: "desc" },
-        include: { beats: { orderBy: { order: "asc" } } },
+        include: {
+          beats: {
+            orderBy: { order: "asc" },
+            include: {
+              voiceTakes: { orderBy: { createdAt: "desc" } },
+              mediaLinks: {
+                orderBy: { order: "asc" },
+                include: { mediaAsset: true },
+              },
+            },
+          },
+        },
       },
       mediaAssets: { orderBy: { createdAt: "desc" } },
-      timelines: { orderBy: { version: "desc" } },
+      timelines: {
+        orderBy: { version: "desc" },
+        include: { items: { orderBy: [{ trackIndex: "asc" }, { order: "asc" }] } },
+      },
       exports: { orderBy: { createdAt: "desc" } },
     },
   });
