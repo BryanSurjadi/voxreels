@@ -7,6 +7,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { apiRequest, logout } from "@/lib/auth";
 import { RoundedPicker } from "@/components/rounded-picker";
 import { ProductionWorkspace } from "@/components/production-workspace";
+import { UsageRing, type Usage } from "@/components/usage-ring";
 
 type TruthRequirement =
   | "real_footage_required"
@@ -32,6 +33,7 @@ type ScriptVersion = {
   totalTokens: number | null;
   beats: ScriptBeat[];
 };
+type RefinedBeat = { voiceover: string; delivery: string; onScreenText: string; visualRequirement: string; truthRequirement: TruthRequirement };
 type Project = {
   id: string;
   name: string;
@@ -83,6 +85,14 @@ export function ProjectReview({ projectId }: { projectId: string }) {
   const [isSavingScript, setIsSavingScript] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [tokenUsage, setTokenUsage] = useState<Usage | null>(null);
+  const [refineInstruction, setRefineInstruction] = useState("");
+  const [refineProposal, setRefineProposal] = useState<{ beatId: string; value: RefinedBeat } | null>(null);
+  const [isRefining, setIsRefining] = useState(false);
+
+  function refreshUsage() {
+    void apiRequest<Usage>("/usage").then(setTokenUsage).catch(() => {});
+  }
 
   async function refresh() {
     const next = await getProject(projectId);
@@ -92,10 +102,13 @@ export function ProjectReview({ projectId }: { projectId: string }) {
     setActiveBeat(0);
     setIsDirty(false);
     setIsBriefDirty(false);
+    setRefineProposal(null);
+    refreshUsage();
     return next;
   }
 
   useEffect(() => {
+    refreshUsage();
     getProject(projectId)
       .then((next) => {
         setProject(next);
@@ -129,6 +142,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
       );
     } finally {
       setIsGenerating(false);
+      refreshUsage();
     }
   }
 
@@ -176,6 +190,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
     >,
     value: string,
   ) {
+    setRefineProposal(null);
     setBeats((current) =>
       current.map((beat, index) =>
         index === activeBeat ? { ...beat, [field]: value } : beat,
@@ -183,6 +198,38 @@ export function ProjectReview({ projectId }: { projectId: string }) {
     );
     setIsDirty(true);
     setNotice("");
+  }
+
+  async function askAiToRefine() {
+    const script = project?.scriptVersions[0];
+    const beat = beats[activeBeat];
+    if (!script || !beat || !refineInstruction.trim()) return;
+    if (isDirty) return setError("Save your script changes before asking AI to refine a beat.");
+    setError("");
+    setNotice("");
+    setRefineProposal(null);
+    setIsRefining(true);
+    try {
+      const value = await apiRequest<RefinedBeat>(`/projects/${projectId}/scripts/${script.id}/beats/${beat.id}/refine`, {
+        method: "POST",
+        body: JSON.stringify({ instruction: refineInstruction.trim(), model }),
+      });
+      setRefineProposal({ beatId: beat.id, value });
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : "Could not refine this beat.");
+    } finally {
+      setIsRefining(false);
+      refreshUsage();
+    }
+  }
+
+  function useRefinement() {
+    if (!refineProposal) return;
+    setBeats((current) => current.map((beat) => beat.id === refineProposal.beatId ? { ...beat, ...refineProposal.value } : beat));
+    setIsDirty(true);
+    setRefineProposal(null);
+    setRefineInstruction("");
+    setNotice("AI draft applied locally. Review it, then save your script.");
   }
 
   async function saveScript() {
@@ -354,6 +401,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
         </header>
 
         <div className="mx-auto max-w-[1180px] px-5 py-10 sm:px-8 sm:py-14">
+          {tokenUsage && <div className="mb-8 max-w-[480px]"><UsageRing usage={tokenUsage} /></div>}
           {!script ? (
             <div className="grid gap-8 xl:grid-cols-[minmax(0,1fr)_360px]">
               <section>
@@ -485,7 +533,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
                   className="button button-dark mt-5 w-full disabled:cursor-not-allowed disabled:opacity-40"
                   type="button"
                   onClick={generateScript}
-                  disabled={isGenerating || isBriefDirty}
+                  disabled={isGenerating || isBriefDirty || tokenUsage?.creditsRemaining === 0}
                 >
                   {isGenerating
                     ? "Writing your script…"
@@ -494,7 +542,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
                       : "Generate script"}
                 </button>
                 <p className="mt-3 text-center text-[11px] text-zinc-400">
-                  Counts toward the daily generation limit.
+                  Uses 1 monthly generation credit. The daily safety limit also applies.
                 </p>
               </aside>
             </div>
@@ -612,6 +660,34 @@ export function ProjectReview({ projectId }: { projectId: string }) {
                       Footage requirement
                       <div className="mt-2"><RoundedPicker value={selectedBeat.truthRequirement ?? "generated_visual_allowed"} options={footageOptions} disabled={approved} onChange={(value) => updateBeat("truthRequirement", value)} /></div>
                     </div>
+                    {!approved && (
+                      <div className="mt-6 border-t border-zinc-300 pt-5">
+                        <p className="text-xs font-bold uppercase tracking-[0.14em] text-zinc-500">Ask AI to refine this beat</p>
+                        <p className="mt-1 text-xs leading-5 text-zinc-500">Get a proposal for this beat only. Your script stays unchanged until you use it.</p>
+                        <p className="mt-1 text-xs text-zinc-500">Uses 1 generation credit.</p>
+                        <label className="mt-4 block text-xs font-semibold" htmlFor="refine-instruction">What should change?</label>
+                        <textarea
+                          id="refine-instruction"
+                          className="mt-2 min-h-24 w-full resize-y rounded-2xl border border-zinc-200 bg-white p-3 text-sm outline-none focus:outline-none"
+                          placeholder="Make the hook more surprising without changing the facts"
+                          value={refineInstruction}
+                          maxLength={500}
+                          onChange={(event) => setRefineInstruction(event.target.value)}
+                        />
+                        <div className="mt-3"><RoundedPicker value={model} options={models.map((option) => ({ value: option.id, label: option.name, badge: option.name.slice(0, 1) }))} onChange={(value) => setModel(value as typeof model)} /></div>
+                        <button className="mt-3 w-full rounded-full bg-black px-4 py-3 text-sm font-semibold text-white disabled:opacity-40" type="button" disabled={isRefining || isDirty || refineInstruction.trim().length < 3 || tokenUsage?.creditsRemaining === 0} onClick={() => void askAiToRefine()}>
+                          {isRefining ? "Thinking…" : isDirty ? "Save changes before asking AI" : "Ask AI"}
+                        </button>
+                        {refineProposal?.beatId === selectedBeat.id && (
+                          <div className="mt-4 rounded-2xl border border-zinc-300 bg-white p-4" aria-live="polite">
+                            <p className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Proposed voiceover</p>
+                            <p className="mt-2 whitespace-pre-wrap text-sm leading-6">{refineProposal.value.voiceover}</p>
+                            <details className="mt-3 text-xs text-zinc-600"><summary className="cursor-pointer font-semibold">Production notes</summary><p className="mt-2">Delivery: {refineProposal.value.delivery}</p><p className="mt-1">On-screen: {refineProposal.value.onScreenText}</p><p className="mt-1">Visual: {refineProposal.value.visualRequirement}</p><p className="mt-1">Footage: {refineProposal.value.truthRequirement.replaceAll("_", " ")}</p></details>
+                            <div className="mt-4 flex gap-2"><button className="rounded-full bg-black px-4 py-2 text-xs font-bold text-white" type="button" onClick={useRefinement}>Use this draft</button><button className="rounded-full border border-zinc-200 px-4 py-2 text-xs font-semibold" type="button" onClick={() => setRefineProposal(null)}>Discard</button></div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </aside>
                 </div>
               )}
@@ -657,7 +733,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
                   )}
                 </div>
               </div>
-              {approved && <ProductionWorkspace key={project.timelines[0]?.id ?? "production"} project={project} onRefresh={refresh} />}
+              {approved && <ProductionWorkspace key={project.timelines[0]?.id ?? "production"} project={project} onRefresh={refresh} creditsRemaining={tokenUsage?.creditsRemaining} />}
             </section>
           )}
           {error && (

@@ -16,8 +16,27 @@ model Workspace {
   memberships   WorkspaceMembership[]
   refreshTokens RefreshToken[]
   mediaAssets   MediaAsset[]
+  plan          SubscriptionPlan      @default(FREE)
+  aiTokenMonths AiTokenMonth[]
   createdAt     DateTime              @default(now())
   updatedAt     DateTime              @updatedAt
+}
+
+enum SubscriptionPlan {
+  FREE
+  PRO
+}
+
+model AiTokenMonth {
+  workspaceId     String    @db.Uuid
+  periodStart     DateTime  @db.Date
+  usedTokens      Int       @default(0)
+  reservedTokens  Int       @default(0)
+  usedCredits     Int       @default(0)
+  reservedCredits Int       @default(0)
+  workspace       Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([workspaceId, periodStart])
 }
 
 model Brand {

@@ -2,6 +2,8 @@ import type { RequestHandler } from "express";
 import { projectIdParamsSchema } from "../schemas/project.schema.js";
 import {
   generateScriptSchema,
+  refineBeatParamsSchema,
+  refineBeatSchema,
   scriptVersionParamsSchema,
   updateScriptSchema,
 } from "../schemas/script.schema.js";
@@ -24,6 +26,19 @@ export const update: RequestHandler = async (request, response) => {
   const input = updateScriptSchema.parse(request.body);
   const script = await scriptService.updateScript(request.auth!.workspaceId, projectId, scriptVersionId, input);
   response.json({ data: script });
+};
+
+export const refine: RequestHandler = async (request, response) => {
+  const { projectId, scriptVersionId, beatId } = refineBeatParamsSchema.parse(request.params);
+  const input = refineBeatSchema.parse(request.body);
+  const proposal = await scriptService.refineBeat(
+    request.auth!.workspaceId,
+    projectId,
+    scriptVersionId,
+    beatId,
+    input,
+  );
+  response.json({ data: proposal });
 };
 
 export const approve: RequestHandler = async (request, response) => {

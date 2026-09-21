@@ -35,6 +35,7 @@ projectsRouter.post(
   scriptController.generate,
 );
 projectsRouter.patch("/:projectId/scripts/:scriptVersionId", scriptController.update);
+projectsRouter.post("/:projectId/scripts/:scriptVersionId/beats/:beatId/refine", scriptGenerationLimiter, scriptController.refine);
 projectsRouter.post("/:projectId/scripts/:scriptVersionId/approve", scriptController.approve);
 projectsRouter.post("/:projectId/voice/generate", mediaGenerationLimiter, productionController.generateVoice);
 projectsRouter.post("/:projectId/broll/generate", mediaGenerationLimiter, productionController.generateBroll);
@@ -44,6 +45,10 @@ projectsRouter.post("/:projectId/media", raw({ type: ["image/*", "audio/*", "vid
 projectsRouter.post("/:projectId/timeline", productionController.initializeTimeline);
 projectsRouter.patch("/:projectId/timeline/:timelineId", productionController.updateTimeline);
 projectsRouter.post("/:projectId/timeline/:timelineId/items", productionController.addTimelineItem);
+projectsRouter.post("/:projectId/timeline/:timelineId/items/:itemId/split", productionController.splitTimelineItem);
+projectsRouter.get("/:projectId/bundle", productionController.downloadBundle);
+projectsRouter.post("/:projectId/render", productionController.renderVideo);
+projectsRouter.get("/:projectId/exports/:exportId", productionController.exportMedia);
 projectsRouter.post("/:projectId/export", productionController.exportProject);
 projectsRouter.get("/:projectId", projectController.get);
 projectsRouter.patch("/:projectId", projectController.update);

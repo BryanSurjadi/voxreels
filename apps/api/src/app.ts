@@ -19,6 +19,7 @@ if (env.NODE_ENV === "production") {
 app.use(
   pinoHttp({
     enabled: env.NODE_ENV !== "test",
+    autoLogging: false,
     redact: {
       paths: [
         "req.headers.authorization",

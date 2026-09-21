@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { apiRequest, logout } from "@/lib/auth";
 import { BrandPicker, type Brand } from "@/components/brand-picker";
 import { RoundedPicker } from "@/components/rounded-picker";
+import { UsageRing, type Usage } from "@/components/usage-ring";
 
 type Project = {
   id: string;
@@ -38,17 +39,20 @@ export function Dashboard({ initialTopic }: { initialTopic: string }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedBrandId, setSelectedBrandId] = useState("");
   const [duration, setDuration] = useState("30");
+  const [usage, setUsage] = useState<Usage | null>(null);
 
   useEffect(() => {
     Promise.all([
       apiRequest<Brand[]>("/brands"),
       apiRequest<Project[]>("/projects"),
       apiRequest<CurrentUser>("/auth/me"),
+      apiRequest<Usage>("/usage"),
     ])
-      .then(([brandData, projectData, userData]) => {
+      .then(([brandData, projectData, userData, usageData]) => {
         setBrands(brandData);
         setProjects(projectData);
         setMe(userData);
+        setUsage(usageData);
         setSelectedBrandId(brandData[0]?.id ?? "");
       })
       .catch(() => router.replace("/login"))
@@ -177,6 +181,8 @@ export function Dashboard({ initialTopic }: { initialTopic: string }) {
             <h1 className="mt-4 text-5xl font-black tracking-[-0.065em] sm:text-7xl">What are we making?</h1>
             <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-zinc-500 sm:text-lg">Give VoxReels the rough thought. Add direction only where it matters.</p>
           </div>
+
+          {usage && <div className="mx-auto mt-8 max-w-[480px]"><UsageRing usage={usage} /></div>}
 
           <form className="dashboard-composer mx-auto mt-10 max-w-[800px]" onSubmit={createProject}>
             <label className="sr-only" htmlFor="topic">Reel topic</label>

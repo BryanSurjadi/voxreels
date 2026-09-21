@@ -1,6 +1,8 @@
 import type { RequestHandler } from "express";
+import { ZipArchive } from "archiver";
 import { projectIdParamsSchema } from "../schemas/project.schema.js";
-import { addTimelineItemSchema, brollGenerationSchema, mediaParamsSchema, timelineParamsSchema, updateTimelineSchema, voiceGenerationSchema } from "../schemas/production.schema.js";
+import { addTimelineItemSchema, brollGenerationSchema, exportParamsSchema, mediaParamsSchema, splitTimelineItemSchema, timelineParamsSchema, updateTimelineSchema, voiceGenerationSchema } from "../schemas/production.schema.js";
+import { z } from "zod";
 import * as productionService from "../services/production.service.js";
 
 export const generateVoice: RequestHandler = async (request, response) => {
@@ -31,6 +33,12 @@ export const addTimelineItem: RequestHandler = async (request, response) => {
   response.status(201).json({ data: await productionService.addTimelineItem(request.auth!.workspaceId, projectId, timelineId, addTimelineItemSchema.parse(request.body)) });
 };
 
+export const splitTimelineItem: RequestHandler = async (request, response) => {
+  const { projectId, timelineId, itemId } = timelineParamsSchema.extend({ itemId: z.uuid() }).parse(request.params);
+  const { atMs } = splitTimelineItemSchema.parse(request.body);
+  response.status(201).json({ data: await productionService.splitTimelineItem(request.auth!.workspaceId, projectId, timelineId, itemId, atMs) });
+};
+
 export const uploadMedia: RequestHandler = async (request, response) => {
   const { projectId } = projectIdParamsSchema.parse(request.params);
   const fileName = typeof request.headers["x-file-name"] === "string" ? decodeURIComponent(request.headers["x-file-name"]) : "Uploaded media";
@@ -42,6 +50,28 @@ export const uploadMedia: RequestHandler = async (request, response) => {
 export const exportProject: RequestHandler = async (request, response) => {
   const { projectId } = projectIdParamsSchema.parse(request.params);
   response.status(201).json({ data: await productionService.exportProject(request.auth!.workspaceId, projectId) });
+};
+
+export const downloadBundle: RequestHandler = async (request, response) => {
+  const { projectId } = projectIdParamsSchema.parse(request.params);
+  const bundle = await productionService.assetBundle(request.auth!.workspaceId, projectId);
+  response.attachment(bundle.fileName).type("application/zip");
+  const archive = new ZipArchive({ zlib: { level: 6 } });
+  archive.on("error", (error) => response.destroy(error));
+  archive.pipe(response);
+  bundle.files.forEach((file) => archive.append(file.data, { name: file.name }));
+  await archive.finalize();
+};
+
+export const renderVideo: RequestHandler = async (request, response) => {
+  const { projectId } = projectIdParamsSchema.parse(request.params);
+  response.status(201).json({ data: await productionService.renderVideo(request.auth!.workspaceId, projectId) });
+};
+
+export const exportMedia: RequestHandler = async (request, response) => {
+  const { projectId, exportId } = exportParamsSchema.parse(request.params);
+  const result = await productionService.getExportMedia(request.auth!.workspaceId, projectId, exportId);
+  response.type(result.mimeType).send(result.data);
 };
 
 function media(kind: "voice" | "broll"): RequestHandler {

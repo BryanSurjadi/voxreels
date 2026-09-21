@@ -41,7 +41,7 @@ function MediaPreview({ path, kind }: { path: string; kind: "audio" | "image" })
   return <div><div className="relative aspect-[2/3] overflow-hidden rounded-2xl bg-zinc-200"><Image fill unoptimized className="object-cover" src={url} alt="Generated B-roll" /></div><a className="mt-2 inline-block text-xs font-semibold underline" href={url} download="broll.png">Download B-roll</a></div>;
 }
 
-export function ProductionWorkspace({ project, onRefresh }: { project: ProductionProject; onRefresh: () => Promise<unknown> }) {
+export function ProductionWorkspace({ project, onRefresh, creditsRemaining }: { project: ProductionProject; onRefresh: () => Promise<unknown>; creditsRemaining?: number }) {
   const script = project.scriptVersions.find((version) => version.status === "approved");
   const beats = script?.beats ?? [];
   const timeline = project.timelines[0];
@@ -69,6 +69,17 @@ export function ProductionWorkspace({ project, onRefresh }: { project: Productio
     finally { setBusy(""); }
   }
 
+  async function downloadBundle() {
+    setBusy("bundle"); setError("");
+    try {
+      const blob = await apiBlob(`/projects/${project.id}/bundle`);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a"); link.href = url; link.download = `${project.name.replace(/[^a-z0-9]+/gi, "-").toLowerCase()}-assets.zip`; link.click(); URL.revokeObjectURL(url);
+      setNotice("Script, voiceovers, and generated B-roll downloaded.");
+    } catch (requestError) { setError(requestError instanceof Error ? requestError.message : "Asset download failed."); }
+    finally { setBusy(""); }
+  }
+
   function toggleBroll(beatId: string) {
     setSelectedBroll((current) => current.includes(beatId) ? current.filter((id) => id !== beatId) : [...current, beatId]);
   }
@@ -90,8 +101,9 @@ export function ProductionWorkspace({ project, onRefresh }: { project: Productio
         <article className="rounded-3xl border border-zinc-200 bg-white p-6">
           <div className="flex items-center justify-between"><b>Voiceover</b><span className="font-mono text-xs text-zinc-400">{voiceCount}/{beats.length}</span></div>
           <p className="mt-2 text-sm text-zinc-500">ElevenLabs Flash v2.5 · roughly $0.05 per 1,000 characters.</p>
+          <p className="mt-1 text-xs text-zinc-500">1 generation credit for all missing voiceovers.</p>
           <div className="mt-5 text-xs font-semibold">Voice<div className="mt-2"><RoundedPicker value={gender} onChange={setGender} options={[{ value: "female", label: "Female voice", badge: "F" }, { value: "male", label: "Male voice", badge: "M" }]} /></div></div>
-          <button className="button button-dark mt-4 w-full disabled:opacity-40" disabled={Boolean(busy)} onClick={() => void run("voice", () => apiRequest(`/projects/${project.id}/voice/generate`, { method: "POST", body: JSON.stringify({ gender }) }), "Voiceovers generated.")}>{busy === "voice" ? "Generating voice…" : voiceCount ? "Generate missing voiceovers" : "Generate voiceovers"}</button>
+          <button className="button button-dark mt-4 w-full disabled:opacity-40" disabled={Boolean(busy) || creditsRemaining === 0} onClick={() => void run("voice", () => apiRequest(`/projects/${project.id}/voice/generate`, { method: "POST", body: JSON.stringify({ gender }) }), "Voiceovers generated.")}>{busy === "voice" ? "Generating voice…" : voiceCount ? "Generate missing voiceovers" : "Generate voiceovers"}</button>
         </article>
         <article className="rounded-3xl bg-black p-6 text-white">
           <div className="flex items-center justify-between"><b>Optional B-roll</b><span className="font-mono text-xs text-zinc-500">{brollCount}/{eligibleBroll}</span></div>
@@ -100,12 +112,12 @@ export function ProductionWorkspace({ project, onRefresh }: { project: Productio
             Select the beat cards below. Real-footage beats and completed images cannot be selected.
           </div>
           <div className="mt-4 flex items-center justify-between text-xs text-zinc-400">
-            <span>{selectedBroll.length} selected</span>
+            <span>{selectedBroll.length} selected · {selectedBroll.length} credits</span>
             <span>Estimated ≤ ${estimatedBrollCost.toFixed(2)}</span>
           </div>
           <button
             className="mt-3 w-full rounded-full bg-white px-5 py-3 text-sm font-semibold text-black disabled:opacity-40"
-            disabled={Boolean(busy) || selectedBroll.length === 0}
+            disabled={Boolean(busy) || selectedBroll.length === 0 || (creditsRemaining !== undefined && selectedBroll.length > creditsRemaining)}
             onClick={() => void run(
               "broll",
               async () => {
@@ -151,9 +163,9 @@ export function ProductionWorkspace({ project, onRefresh }: { project: Productio
       </div>
 
       {voiceCount === beats.length && beats.length > 0 && (
-        <div className="mt-8 rounded-3xl border border-zinc-300 bg-white p-5 sm:p-6" role="status">
-          <p className="font-bold">Your production assets are ready.</p>
-          <p className="mt-1 text-sm leading-6 text-zinc-500">Download the voiceovers and any generated B-roll directly from the beat cards above. The editor is optional if you only need the finished script and media files.</p>
+        <div className="mt-8 flex flex-col items-start justify-between gap-5 rounded-3xl border border-zinc-300 bg-white p-5 sm:flex-row sm:items-center sm:p-6" role="status">
+          <div><p className="font-bold">Your production assets are ready.</p><p className="mt-1 text-sm leading-6 text-zinc-500">Download one ZIP containing the script, voiceovers, and generated B-roll. Continue to the editor only if you want a finished video.</p></div>
+          <button className="button button-dark shrink-0 disabled:opacity-40" type="button" disabled={Boolean(busy)} onClick={() => void downloadBundle()}>{busy === "bundle" ? "Preparing ZIP…" : "Download all assets"}</button>
         </div>
       )}
 

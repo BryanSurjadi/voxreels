@@ -15,6 +15,25 @@ export const scriptVersionParamsSchema = z.object({
   scriptVersionId: z.uuid(),
 });
 
+export const refineBeatParamsSchema = scriptVersionParamsSchema.extend({ beatId: z.uuid() });
+
+export const refineBeatSchema = z.object({
+  instruction: z.string().trim().min(3).max(500),
+  model: z.enum(SUPPORTED_SCRIPT_MODELS).default("gpt-5.6-terra"),
+});
+
+export const refinedBeatSchema = z.object({
+  voiceover: z.string().trim().min(1).max(2_000),
+  delivery: z.string().trim().max(500),
+  onScreenText: z.string().trim().max(500),
+  visualRequirement: z.string().trim().max(1_000),
+  truthRequirement: z.enum([
+    "real_footage_required",
+    "real_footage_preferred",
+    "generated_visual_allowed",
+  ]),
+});
+
 export const updateScriptSchema = z.object({
   beats: z.array(z.object({
     id: z.uuid(),
@@ -54,3 +73,4 @@ export const generatedScriptSchema = z.object({
 export type GenerateScriptInput = z.infer<typeof generateScriptSchema>;
 export type GeneratedScript = z.infer<typeof generatedScriptSchema>;
 export type UpdateScriptInput = z.infer<typeof updateScriptSchema>;
+export type RefineBeatInput = z.infer<typeof refineBeatSchema>;

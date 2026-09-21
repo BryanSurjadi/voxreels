@@ -90,6 +90,13 @@ export function setProjectStatus(workspaceId: string, projectId: string, status:
   return prisma.project.updateMany({ where: { id: projectId, workspaceId }, data: { status } });
 }
 
+export function beginAssetGeneration(workspaceId: string, projectId: string) {
+  return prisma.project.updateMany({
+    where: { id: projectId, workspaceId, status: { notIn: ["generating_script", "generating_assets", "exporting"] } },
+    data: { status: "generating_assets" },
+  });
+}
+
 export function createTimeline(projectId: string, scriptVersionId: string, name: string, durationMs: number, items: Array<{
   scriptBeatId: string;
   mediaAssetId?: string;
@@ -112,12 +119,13 @@ export function createTimeline(projectId: string, scriptVersionId: string, name:
   });
 }
 
-export function updateTimeline(workspaceId: string, projectId: string, timelineId: string, items: Array<{ id: string; startMs: number; durationMs: number }>) {
+export function updateTimeline(workspaceId: string, projectId: string, timelineId: string, items: Array<{ id: string; startMs: number; durationMs: number; trimStartMs: number; text: string | null }>) {
   return prisma.$transaction(async (tx) => {
     const timeline = await tx.timeline.findFirst({ where: { id: timelineId, projectId, project: { workspaceId } }, include: { items: true } });
-    if (!timeline || items.some((item) => !timeline.items.some((existing) => existing.id === item.id))) return null;
-    await Promise.all(items.map((item) => tx.timelineItem.update({ where: { id: item.id }, data: { startMs: item.startMs, durationMs: item.durationMs } })));
-    const durationMs = Math.max(...items.map((item) => item.startMs + item.durationMs));
+    if (!timeline || new Set(items.map((item) => item.id)).size !== items.length || items.some((item) => !timeline.items.some((existing) => existing.id === item.id && (existing.trackType === "text" || item.text === existing.text)))) return null;
+    await tx.timelineItem.deleteMany({ where: { timelineId, id: { notIn: items.map((item) => item.id) } } });
+    await Promise.all(items.map((item) => tx.timelineItem.update({ where: { id: item.id }, data: { startMs: item.startMs, durationMs: item.durationMs, trimStartMs: item.trimStartMs, ...(item.text !== null && { text: item.text }) } })));
+    const durationMs = Math.max(1000, ...items.map((item) => item.startMs + item.durationMs));
     return tx.timeline.update({ where: { id: timelineId }, data: { durationMs }, include: { items: { orderBy: [{ trackIndex: "asc" }, { order: "asc" }] } } });
   });
 }
@@ -128,18 +136,33 @@ export function createUploadedMedia(workspaceId: string, projectId: string, name
   });
 }
 
-export function addMediaToTimeline(workspaceId: string, projectId: string, timelineId: string, input: { mediaAssetId: string; trackType: "visual" | "audio"; startMs: number; durationMs: number }) {
+export function addMediaToTimeline(workspaceId: string, projectId: string, timelineId: string, input: { mediaAssetId: string; trackType: "visual" | "audio"; startMs: number; durationMs: number } | { trackType: "text"; text: string; startMs: number; durationMs: number }) {
   return prisma.$transaction(async (tx) => {
-    const [timeline, asset] = await Promise.all([
-      tx.timeline.findFirst({ where: { id: timelineId, projectId, project: { workspaceId } } }),
-      tx.mediaAsset.findFirst({ where: { id: input.mediaAssetId, projectId, workspaceId, status: "ready" } }),
-    ]);
-    if (!timeline || !asset) return null;
-    const trackIndex = input.trackType === "audio" ? 3 : 1;
+    const timeline = await tx.timeline.findFirst({ where: { id: timelineId, projectId, project: { workspaceId } } });
+    const asset = input.trackType === "text" ? null : await tx.mediaAsset.findFirst({ where: { id: input.mediaAssetId, projectId, workspaceId, status: "ready", kind: { in: input.trackType === "visual" ? ["image", "video"] : ["audio"] } } });
+    if (!timeline || (input.trackType !== "text" && !asset)) return null;
+    const trackIndex = input.trackType === "audio" ? 3 : input.trackType === "text" ? 2 : 1;
     const latest = await tx.timelineItem.aggregate({ where: { timelineId, trackIndex }, _max: { order: true } });
     return tx.timelineItem.create({
-      data: { timelineId, mediaAssetId: asset.id, trackType: input.trackType, trackIndex, order: (latest._max.order ?? -1) + 1, startMs: input.startMs, durationMs: input.durationMs },
+      data: { timelineId, ...(asset && { mediaAssetId: asset.id }), ...(input.trackType === "text" && { text: input.text }), trackType: input.trackType, trackIndex, order: (latest._max.order ?? -1) + 1, startMs: input.startMs, durationMs: input.durationMs },
     });
+  });
+}
+
+export function splitTimelineItem(workspaceId: string, projectId: string, timelineId: string, itemId: string, atMs: number) {
+  return prisma.$transaction(async (tx) => {
+    const item = await tx.timelineItem.findFirst({ where: { id: itemId, timelineId, timeline: { projectId, project: { workspaceId } } }, include: { mediaAsset: true } });
+    if (!item || atMs - item.startMs < 100 || item.startMs + item.durationMs - atMs < 100) return null;
+    const leftDuration = atMs - item.startMs;
+    const latest = await tx.timelineItem.aggregate({ where: { timelineId, trackIndex: item.trackIndex }, _max: { order: true } });
+    await tx.timelineItem.update({ where: { id: item.id }, data: { durationMs: leftDuration } });
+    return tx.timelineItem.create({ data: {
+      timelineId, scriptBeatId: item.scriptBeatId, mediaAssetId: item.mediaAssetId, voiceTakeId: item.voiceTakeId,
+      trackType: item.trackType, trackIndex: item.trackIndex, order: (latest._max.order ?? -1) + 1,
+      startMs: atMs, durationMs: item.durationMs - leftDuration,
+      trimStartMs: item.trimStartMs + (item.trackType === "voice" || item.trackType === "audio" || item.mediaAsset?.kind === "video" ? leftDuration : 0),
+      volume: item.volume, positionX: item.positionX, positionY: item.positionY, scale: item.scale, zIndex: item.zIndex, text: item.text,
+    } });
   });
 }
 
@@ -160,4 +183,35 @@ export function createExport(projectId: string, timelineId: string | undefined, 
       data: { projectId, timelineId: timelineId ?? null, version: (latest._max.version ?? 0) + 1, type: "project_json", status: "complete", metadata },
     });
   });
+}
+
+export function findTimelineForRender(workspaceId: string, projectId: string) {
+  return prisma.timeline.findFirst({
+    where: { projectId, project: { workspaceId } },
+    orderBy: { version: "desc" },
+    include: {
+      project: { select: { name: true } },
+      items: {
+        orderBy: [{ trackIndex: "asc" }, { order: "asc" }],
+        include: { mediaAsset: true, voiceTake: true },
+      },
+    },
+  });
+}
+
+export async function createPendingVideoExport(projectId: string, timelineId: string) {
+  const latest = await prisma.export.aggregate({ where: { projectId, type: "video_mp4" }, _max: { version: true } });
+  return prisma.export.create({ data: { projectId, timelineId, version: (latest._max.version ?? 0) + 1, type: "video_mp4" } });
+}
+
+export function findExport(workspaceId: string, projectId: string, exportId: string) {
+  return prisma.export.findFirst({ where: { id: exportId, projectId, project: { workspaceId }, status: "complete" } });
+}
+
+export function completeVideoExport(id: string, storageKey: string, metadata: object) {
+  return prisma.export.update({ where: { id }, data: { status: "complete", storageKey, metadata } });
+}
+
+export function failVideoExport(id: string, message: string) {
+  return prisma.export.update({ where: { id }, data: { status: "failed", metadata: { error: message } } });
 }
