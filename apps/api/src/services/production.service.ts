@@ -12,6 +12,25 @@ import { reserveGenerationCredits, settleGenerationCredits } from "./ai-quota.se
 const openai = new OpenAI({ apiKey: env.OPENAI_API_KEY, timeout: 120_000 });
 const ffmpegPath = createRequire(import.meta.url)("ffmpeg-static") as string | null;
 
+export async function voiceDurationMs(storageKey: string) {
+  if (!ffmpegPath) throw new AppError(503, "VIDEO_RENDERER_UNAVAILABLE", "The media renderer is unavailable");
+  const output = await new Promise<string>((resolve, reject) => {
+    const process = spawn(ffmpegPath, ["-hide_banner", "-i", mediaPath(storageKey), "-af", "silencedetect=noise=-45dB:d=0.25", "-f", "null", "-"], { windowsHide: true });
+    let stderr = "";
+    process.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString(); });
+    process.on("error", reject);
+    process.on("close", (code) => code === 0 ? resolve(stderr) : reject(new Error(stderr.slice(-5000))));
+  });
+  const lastTime = [...output.matchAll(/time=\s*(\d+):(\d+):(\d+(?:\.\d+)?)/g)].at(-1);
+  if (!lastTime) throw new Error("Could not measure voice duration");
+  const fullMs = Math.round((Number(lastTime[1]) * 3600 + Number(lastTime[2]) * 60 + Number(lastTime[3])) * 1000);
+  const silenceStart = [...output.matchAll(/silence_start: (\d+(?:\.\d+)?)/g)].at(-1);
+  const silenceEnd = [...output.matchAll(/silence_end: (\d+(?:\.\d+)?)/g)].at(-1);
+  const endMs = Number(silenceEnd?.[1] ?? 0) * 1000;
+  const trimMs = silenceStart && endMs >= fullMs - 100 ? Math.round(Number(silenceStart[1]) * 1000) + 150 : fullMs;
+  return Math.max(100, Math.min(fullMs, trimMs));
+}
+
 async function approvedProject(workspaceId: string, projectId: string) {
   const project = await productionRepository.findApprovedProject(workspaceId, projectId);
   if (!project) throw new AppError(404, "PROJECT_NOT_FOUND", "Project not found");
@@ -24,8 +43,11 @@ export async function generateVoice(workspaceId: string, projectId: string, inpu
   const voiceId = input.voiceId ?? (input.gender === "male" ? env.ELEVENLABS_MALE_VOICE_ID : env.ELEVENLABS_FEMALE_VOICE_ID) ?? env.ELEVENLABS_DEFAULT_VOICE_ID;
   if (!voiceId) throw new AppError(400, "VOICE_REQUIRED", "Choose a voice or configure ELEVENLABS_DEFAULT_VOICE_ID");
   const { project, script } = await approvedProject(workspaceId, projectId);
-  const missing = script.beats.filter((beat) => !beat.voiceTakes.some((take) => take.model === input.model && take.voiceId === voiceId));
-  if (!missing.length) return script.beats;
+  if (input.beatIds?.some((beatId) => !script.beats.some((beat) => beat.id === beatId))) throw new AppError(400, "INVALID_SCRIPT_BEAT", "One or more selected beats do not belong to the approved script");
+  const targets = input.beatIds
+    ? script.beats.filter((beat) => input.beatIds!.includes(beat.id))
+    : script.beats.filter((beat) => !beat.voiceTakes.some((take) => take.model === input.model && take.voiceId === voiceId));
+  if (!targets.length) return script.beats;
   const locked = await productionRepository.beginAssetGeneration(workspaceId, projectId);
   if (locked.count !== 1) throw new AppError(409, "PROJECT_BUSY", "This project is already generating content");
 
@@ -33,25 +55,27 @@ export async function generateVoice(workspaceId: string, projectId: string, inpu
   let generated = 0;
   try {
     credit = await reserveGenerationCredits(workspaceId, 1);
-    for (const beat of missing) {
+    for (const beat of targets) {
+      const previousVoiceTakeId = beat.voiceTakes[0]?.id;
       const take = await productionRepository.createVoiceTake(beat.id, input.model, voiceId, beat.voiceover.length);
       try {
         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${encodeURIComponent(voiceId)}?output_format=mp3_44100_128`, {
           method: "POST",
           headers: { "Content-Type": "application/json", "xi-api-key": env.ELEVENLABS_API_KEY },
-          body: JSON.stringify({ text: beat.voiceover, model_id: input.model }),
+          body: JSON.stringify({ text: beat.voiceover.replace(/[‘’]/g, "'"), model_id: input.model }),
         });
         if (!response.ok) throw new Error(`ElevenLabs returned ${response.status}`);
         const storageKey = await storeMedia(Buffer.from(await response.arrayBuffer()), "mp3");
-        await productionRepository.completeVoiceTake(take.id, storageKey, response.headers.get("request-id"));
+        const durationMs = await voiceDurationMs(storageKey);
+        await productionRepository.completeVoiceTake(take.id, storageKey, response.headers.get("request-id"), durationMs);
         generated += 1;
-        await productionRepository.attachVoiceToTimelines(beat.id, take.id);
+        await productionRepository.attachVoiceToTimelines(beat.id, take.id, previousVoiceTakeId);
       } catch (error) {
         await productionRepository.failVoiceTake(take.id, error instanceof Error ? error.message : "Voice generation failed");
         throw error;
       }
     }
-    await productionRepository.setProjectStatus(workspaceId, projectId, "asset_review");
+    await productionRepository.setProjectStatus(workspaceId, projectId, project.timelines.length ? "editing" : "asset_review");
     return approvedProject(workspaceId, projectId).then(({ script: next }) => next.beats);
   } catch (error) {
     await productionRepository.setProjectStatus(workspaceId, projectId, project.status);
@@ -92,7 +116,7 @@ export async function generateBroll(workspaceId: string, projectId: string, inpu
         throw error;
       }
     }
-    await productionRepository.setProjectStatus(workspaceId, projectId, "asset_review");
+    await productionRepository.setProjectStatus(workspaceId, projectId, project.timelines.length ? "editing" : "asset_review");
     return approvedProject(workspaceId, projectId).then(({ script: next }) => next.beats);
   } catch (error) {
     await productionRepository.setProjectStatus(workspaceId, projectId, project.status);
@@ -105,12 +129,10 @@ export async function generateBroll(workspaceId: string, projectId: string, inpu
 
 export async function initializeTimeline(workspaceId: string, projectId: string) {
   const { project, script } = await approvedProject(workspaceId, projectId);
-  const totalDuration = (project.targetDurationSeconds ?? 30) * 1000;
-  const totalCharacters = script.beats.reduce((sum, beat) => sum + beat.voiceover.length, 0) || 1;
+  const beats = await measuredBeats(project.targetDurationSeconds ?? 30, script.beats);
   let startMs = 0;
   const items = script.beats.flatMap((beat, index) => {
-    // ponytail: proportional timing is enough for MVP; replace with probed audio durations when rendering MP4.
-    const durationMs = index === script.beats.length - 1 ? totalDuration - startMs : Math.round(totalDuration * beat.voiceover.length / totalCharacters);
+    const durationMs = beats[index]!.durationMs;
     const common = { scriptBeatId: beat.id, order: index, startMs, durationMs };
     const voice = beat.voiceTakes[0];
     const visual = beat.mediaLinks.find((link) => link.mediaAsset.status === "ready")?.mediaAsset;
@@ -122,8 +144,36 @@ export async function initializeTimeline(workspaceId: string, projectId: string)
     startMs += durationMs;
     return beatItems;
   });
-  const timeline = await productionRepository.createTimeline(projectId, script.id, `${project.name} edit`, totalDuration, items);
+  const timeline = await productionRepository.createTimeline(projectId, script.id, `${project.name} edit`, startMs, items);
   await productionRepository.setProjectStatus(workspaceId, projectId, "editing");
+  return timeline;
+}
+
+async function measuredBeats(targetSeconds: number, beats: Array<{ id: string; voiceover: string; voiceTakes: Array<{ id: string; storageKey: string | null; durationMs: number | null }> }>) {
+  const totalCharacters = beats.reduce((sum, beat) => sum + beat.voiceover.length, 0) || 1;
+  const durations = await Promise.all(beats.map(async (beat) => {
+    const voice = beat.voiceTakes[0];
+    if (!voice?.storageKey) return Math.max(100, Math.round(targetSeconds * 1000 * beat.voiceover.length / totalCharacters));
+    if (voice.durationMs) return voice.durationMs;
+    const durationMs = await voiceDurationMs(voice.storageKey);
+    await productionRepository.setVoiceDuration(voice.id, durationMs);
+    return durationMs;
+  }));
+  let startMs = 0;
+  return beats.map((beat, index) => {
+    const result = { id: beat.id, startMs, durationMs: durations[index]! };
+    startMs += result.durationMs;
+    return result;
+  });
+}
+
+export async function realignTimeline(workspaceId: string, projectId: string, timelineId: string) {
+  const { project, script } = await approvedProject(workspaceId, projectId);
+  if (script.beats.some((beat) => !beat.voiceTakes[0]?.storageKey)) throw new AppError(409, "VOICE_REQUIRED", "Generate all voiceovers before realigning the timeline");
+  const beats = await measuredBeats(project.targetDurationSeconds ?? 30, script.beats);
+  const timeline = await productionRepository.realignGeneratedTimeline(workspaceId, projectId, timelineId, beats);
+  if (timeline === null) throw new AppError(404, "TIMELINE_NOT_FOUND", "Timeline not found");
+  if (timeline === false) throw new AppError(409, "TIMELINE_EDITED", "This timeline has split or removed generated clips; align those clips manually");
   return timeline;
 }
 
@@ -274,7 +324,7 @@ export async function renderVideo(workspaceId: string, projectId: string) {
     filters.push(`[${visual.input}:v]scale=${timeline.canvasWidth}:${timeline.canvasHeight}:force_original_aspect_ratio=decrease,pad=${timeline.canvasWidth}:${timeline.canvasHeight}:(ow-iw)/2:(oh-ih)/2:black,setsar=1,setpts=PTS-STARTPTS+${visual.start}/TB[v${index}]`);
     filters.push(`[base${index}][v${index}]overlay=eof_action=pass:enable='between(t,${visual.start},${visual.end})'[base${index + 1}]`);
   });
-  audios.forEach((audio, index) => filters.push(`[${audio.input}:a]apad,atrim=0:${audio.duration},asetpts=PTS-STARTPTS,adelay=${audio.startMs}:all=1,volume=${audio.volume}[a${index}]`));
+  audios.forEach((audio, index) => filters.push(`[${audio.input}:a]atrim=0:${audio.duration},asetpts=PTS-STARTPTS,adelay=${audio.startMs}:all=1,volume=${audio.volume}[a${index}]`));
   if (audios.length) filters.push(`${audios.map((_, index) => `[a${index}]`).join("")}amix=inputs=${audios.length}:duration=longest:normalize=0,atrim=0:${durationSeconds}[audio]`);
 
   const captions = timeline.items.filter((item) => item.trackType === "text" && item.text?.trim());

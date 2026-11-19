@@ -22,7 +22,7 @@ type ScriptBeat = {
   onScreenText: string | null;
   visualRequirement: string | null;
   truthRequirement: TruthRequirement | null;
-  voiceTakes: Array<{ id: string; status: string; model: string; voiceId: string | null }>;
+  voiceTakes: Array<{ id: string; status: string; model: string; voiceId: string | null; durationMs: number | null }>;
   mediaLinks: Array<{ mediaAsset: { id: string; status: string; mimeType: string | null } }>;
 };
 type ScriptVersion = {
@@ -53,9 +53,9 @@ type Project = {
 };
 
 const models = [
-  { id: "gpt-5.6-terra", name: "Terra", note: "Balanced · recommended" },
-  { id: "gpt-5.6-sol", name: "Sol", note: "Higher reasoning" },
-  { id: "gpt-5.5", name: "5.5", note: "Previous generation" },
+  { id: "gpt-6.1-sol", name: "GPT-6.1 Sol", note: "Recommended" },
+  { id: "gpt-6.1-terra", name: "GPT-6.1 Terra", note: "Lower-cost writing" },
+  { id: "gpt-6-luna", name: "GPT-6 Luna", note: "Lowest-cost drafts" },
 ] as const;
 const durationOptions = [15, 30, 45, 60].map((seconds) => ({ value: String(seconds), label: `${seconds} seconds`, badge: String(seconds) }));
 const footageOptions = [
@@ -74,7 +74,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
   const [beats, setBeats] = useState<ScriptBeat[]>([]);
   const [activeBeat, setActiveBeat] = useState(0);
   const [model, setModel] =
-    useState<(typeof models)[number]["id"]>("gpt-5.6-terra");
+    useState<(typeof models)[number]["id"]>(models[0].id);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -674,7 +674,7 @@ export function ProjectReview({ projectId }: { projectId: string }) {
                           maxLength={500}
                           onChange={(event) => setRefineInstruction(event.target.value)}
                         />
-                        <div className="mt-3"><RoundedPicker value={model} options={models.map((option) => ({ value: option.id, label: option.name, badge: option.name.slice(0, 1) }))} onChange={(value) => setModel(value as typeof model)} /></div>
+                        <div className="mt-3"><RoundedPicker value={model} options={models.map((option) => ({ value: option.id, label: option.name }))} onChange={(value) => setModel(value as typeof model)} /></div>
                         <button className="mt-3 w-full rounded-full bg-black px-4 py-3 text-sm font-semibold text-white disabled:opacity-40" type="button" disabled={isRefining || isDirty || refineInstruction.trim().length < 3 || tokenUsage?.creditsRemaining === 0} onClick={() => void askAiToRefine()}>
                           {isRefining ? "Thinking…" : isDirty ? "Save changes before asking AI" : "Ask AI"}
                         </button>

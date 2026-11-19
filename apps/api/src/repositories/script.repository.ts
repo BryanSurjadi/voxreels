@@ -107,6 +107,7 @@ export function saveGeneratedScript(input: {
   inputTokens?: number;
   outputTokens?: number;
   totalTokens?: number;
+  references: Array<{ id: string; similarityScore: number; retrievalRank: number }>;
   script: GeneratedScript;
 }) {
   return prisma.$transaction(async (transaction) => {
@@ -134,6 +135,15 @@ export function saveGeneratedScript(input: {
             ...beat,
           })),
         },
+        ...(input.references.length && {
+          references: {
+            create: input.references.map((reference) => ({
+              referenceScriptId: reference.id,
+              similarityScore: reference.similarityScore,
+              retrievalRank: reference.retrievalRank,
+            })),
+          },
+        }),
       },
       include: { beats: { orderBy: { order: "asc" } } },
     });

@@ -1,13 +1,15 @@
 import { z } from "zod";
 
 export const SUPPORTED_SCRIPT_MODELS = [
-  "gpt-5.6-terra",
-  "gpt-5.6-sol",
-  "gpt-5.5",
+  "gpt-6.1-sol",
+  "gpt-6.1-terra",
+  "gpt-6-luna",
 ] as const;
 
+const scriptModelSchema = z.enum(SUPPORTED_SCRIPT_MODELS).default(SUPPORTED_SCRIPT_MODELS[0]);
+
 export const generateScriptSchema = z.object({
-  model: z.enum(SUPPORTED_SCRIPT_MODELS).default("gpt-5.6-terra"),
+  model: scriptModelSchema,
 });
 
 export const scriptVersionParamsSchema = z.object({
@@ -19,7 +21,7 @@ export const refineBeatParamsSchema = scriptVersionParamsSchema.extend({ beatId:
 
 export const refineBeatSchema = z.object({
   instruction: z.string().trim().min(3).max(500),
-  model: z.enum(SUPPORTED_SCRIPT_MODELS).default("gpt-5.6-terra"),
+  model: scriptModelSchema,
 });
 
 export const refinedBeatSchema = z.object({

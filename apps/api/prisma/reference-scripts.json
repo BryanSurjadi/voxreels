@@ -1,0 +1,403 @@
+[
+  {
+    "sourceUrl": "https://ads.tiktok.com/business/en-US/inspiration/crew-supply-co.-585?redirected=1",
+    "platform": "tiktok",
+    "creator": "Crew Supply Co.",
+    "title": "Old Fashioned Infusion Kit ASMR product demonstration",
+    "language": "en",
+    "niche": "barware and product demonstration",
+    "transcriptSummary": "TikTok's case study describes a product-use ASMR video featuring an Old Fashioned Infusion Kit. It does not publish a transcript or exact shot sequence.",
+    "hookPattern": "Lead with the product in action and a sensory payoff rather than a spoken introduction; inferred from the case-study description, not a verified transcript.",
+    "structureSummary": "Show the kit being used with satisfying sounds and a visible result. Exact beat order is not documented in the source.",
+    "whyItWorked": "TikTok reports that this individual video approached 1.5 million views. Sensory product demonstration is a plausible creative pattern, not a proven causal explanation.",
+    "metrics": { "views": 1500000 },
+    "rightsStatus": "derived_case_study"
+  },
+  {
+    "sourceUrl": "https://ads.tiktok.com/business/en/inspiration/laura-mercier-retargeting-case-study?redirected=1",
+    "platform": "tiktok",
+    "creator": "Laura Mercier / independent creator",
+    "title": "Real Flawless foundation creator review",
+    "language": "en",
+    "niche": "beauty and creator product review",
+    "transcriptSummary": "TikTok's case study describes a creator reviewing Laura Mercier foundation while using it. The source does not provide the spoken script or exact shot sequence.",
+    "hookPattern": "Put the creator's authentic use and opinion at the center; the precise opening line is not documented.",
+    "structureSummary": "A creator uses the product during a review. Any more detailed beat structure would be speculation.",
+    "whyItWorked": "TikTok reports 49.4 million views, 1.5 million likes, and 297,000 shares for this organic video. Authentic in-use review is the documented format; causality is not established.",
+    "metrics": { "views": 49400000, "likes": 1500000, "shares": 297000 },
+    "rightsStatus": "derived_case_study"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@rpn/video/7703644571380632863",
+    "platform": "tiktok",
+    "creator": "Roberto Nickson (@rpn)",
+    "title": "My studio now runs on Claude",
+    "language": "en",
+    "niche": "AI assistant, creator-led product demo, workplace comedy",
+    "durationSeconds": 66,
+    "transcriptSummary": "All right, Claude. Just pulled up to the studio. See you already got the garage. Yes, sir. Good to see you.\n\nSo, what's today look like? Overnight, proposals were sent. The site fix went live. And your inbox is down to the three that actually need you. Your only real job today is the two o'clock. Do try not to blow it. I'll try not to.\n\nWhat's the game plan? Well, the bugs are fixed. The edit is sequenced. I also cleaned up that function you've been avoiding since night. Catch, Jacob. The deck is built. And I left the last slide blank.\n\nWhat's up, Joel? What's going on, Roberto? Ah, I see you reviewed the training footage. What am I doing wrong? Well, a lot of it. I don't even want to know. At least you kept your hands up.\n\nOoh, what is this? A little something I printed overnight for you. One of your kids might like it. Elijah, check this out. Nice throw. By the way, sir, I've been running the budget for this month. Yeah, let's not talk about that.\n\nEthan, tell me you got the edit done. It's all done. Claude did most of it. Amazing. Claude tell me you got the edit done. It's all done. Claude did most of it. Amazing. Claude, put it in the client folder. Let him know it's there. Easy. Just said.\n\nOh, and can you put on something for me to focus? You got it. Lo-fi beats. Playing now. What would I do without you? Oh, you'd manage. Badly. What are you doing? This guy.",
+    "hookPattern": "Start mid-conversation with the product already doing something concrete. Let the viewer infer the premise before explaining the feature set.",
+    "structureSummary": "Dialogue-based breakdown: 1. Arrival and garage reference establish the premise. 2. A morning briefing gives concrete examples of completed work and adds a dry joke. 3. Short exchanges demonstrate coding, editing, presentation prep, coaching and budgeting. 4. A teammate credits the assistant for the edit, then the creator delegates the client handoff. 5. A music request leads into a deadpan punchline. The creator discloses that response timing was simulated for the edit.",
+    "ctaStyle": "The spoken ending is a punchline. The post caption asks viewers whether they want a walkthrough.",
+    "whyItWorked": "Each exchange demonstrates one capability through a recognizable workday situation. The recurring banter gives the assistant a consistent personality and makes the next exchange worth watching.",
+    "metrics": { "likes": 64600, "comments": 265, "saves": 10800, "shares": 6393 },
+    "capturedAt": "2026-11-15T15:58:16Z",
+    "rightsStatus": "user_supplied_transcript_unverified"
+  },
+  {
+    "sourceUrl": "https://www.linkedin.com/posts/jordan-moran-92198b359_thankful-to-have-directed-and-edited-the-activity-7414377119608180736-ApIH",
+    "platform": "linkedin",
+    "creator": "Jordan Moran / Milani Cosmetics",
+    "title": "The Blur Out Routine",
+    "language": "en",
+    "niche": "beauty, makeup artist tutorial, creator-led product demo",
+    "hookExcerpt": "What's the best way to get blurred skin?",
+    "transcriptSummary": "Paraphrased from the director's published transcript. The talent asks how to get a soft-focus finish. The makeup artist starts with a smoothing primer, moves to a buildable tint stick, and dusts powder on areas that tend to get shiny. The talent comments on how each product feels and ends by reacting to the finished look.",
+    "hookPattern": "Let the person receiving the demo ask an outcome-led question the audience might ask.",
+    "structureSummary": "Question, primer demonstration and first reaction, tint application and texture reaction, targeted powder, then final reveal and reaction.",
+    "ctaStyle": "The spoken close is a reaction to the result.",
+    "whyItWorked": "The back-and-forth breaks a three-product routine into small demonstrations and gives the viewer a reaction after each step.",
+    "rightsStatus": "derived_transcript_paraphrase"
+  },
+  {
+    "sourceUrl": "https://www.instagram.com/p/DW4FvvGCuqY",
+    "platform": "instagram",
+    "creator": "@rarebeauty",
+    "title": "How to apply highly pigmented liquid blush",
+    "language": "en",
+    "niche": "beauty, founder-led tutorial, objection handling",
+    "durationSeconds": 40,
+    "transcriptSummary": "Paraphrased from the transcript published by Viral Hooks. The creator opens by admitting she overapplied her own blush, reassures viewers who find liquid blush intimidating, and demonstrates starting with a tiny dot. She keeps blending through the stage when it looks excessive, then encourages viewers to adapt the method to their comfort.",
+    "hookPattern": "Use a relatable mistake to show the exact problem the tutorial solves.",
+    "structureSummary": "Overapplication visual, acknowledge the fear, wipe off excess and use a small amount, show the messy middle as it blends, then reveal the result.",
+    "ctaStyle": "Spoken encouragement to try the technique. The post caption includes a separate shopping CTA.",
+    "whyItWorked": "Showing the messy middle addresses the objection at the moment the viewer is most likely to think they have applied too much.",
+    "rightsStatus": "derived_transcript_paraphrase"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@wowen_makeup/video/7601098081496550676",
+    "platform": "tiktok",
+    "creator": "@wowen_makeup",
+    "title": "Setting powder finish and application review",
+    "language": "fil",
+    "niche": "beauty UGC, setting powder, product review",
+    "transcriptSummary": "highly recommend this product, guys. Look at the finish. When you set your face properly, eto yun. Eto yung gagamitin natin today. And also tomorrow, and tomorrow, tomorrow, and tomorrow, tomorrow, tomorrow. Para nang usok sa sobrang fine nitong powder na to. Walang halong eme. After the first use, araw-araw ko na siya ginamit. Anyway, when applying powder, basta evenly spread mo lang siya sa brush. Then, set mo muna yung mga areas na mabilis mag-crease. Eto kasi talaga yung gusto ko. Legit na translucent. Sobrang blurring. Sobrang smooth ng base mo after. Ang bilis na lang mag-glide ng ibang products na ilalagay. Acne safe na din to. Oil control. Non-comedogenic. Lahat na. And even I take you up close, ayan. Wala talaga. Ang smooth. Kala ko nga mga 700 man lang to. Hindi pa. After multiple times na ginamit ko siya, yung talaga impression ko. Pero hindi ko alam na ganun lang pala kababa yung presyo. So I highly recommend this product guys. Look at the finish. And I'm also finished. Bye!",
+    "hookPattern": "Preview the finished result and tell the viewer exactly where to look.",
+    "structureSummary": "0–6s result-led recommendation, 6–17s product and texture, 17–34s application technique, about 35–49s closer look and closing recommendation. Times are approximate and taken from machine captions.",
+    "ctaStyle": "Closes by drawing attention back to the finish.",
+    "whyItWorked": "The later close-up pays off the opening result preview, and the middle gives viewers a concrete technique they can try.",
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@thegoldenbalance/video/7422273073434365215",
+    "platform": "tiktok",
+    "creator": "@thegoldenbalance",
+    "title": "Chicken Alfredo with a same-pan sauce",
+    "language": "en",
+    "niche": "food, recipe tutorial, cooking voiceover",
+    "hookExcerpt": "Let me show you how to make my incredible chicken Alfredo recipe.",
+    "hookPattern": "Name the end result immediately and lead into the recipe with a quick taste reaction.",
+    "transcriptSummary": "Paraphrase of the TokTranscript captions. The creator names the finished dish, seasons and sears chicken cutlets, then explains how to use the browned bits and juices to build the sauce. He acknowledges that his recipe departs from traditional Alfredo, finishes the pasta in the sauce, and tops it with the chicken and parsley.",
+    "structureSummary": "0–5s name the dish and react to the taste; 5–27s season and sear; 28–48s make the sauce in the pan and briefly address the traditional recipe; 49–59s finish the pasta, plate, and return to the taste reaction.",
+    "ctaStyle": "Ends on a taste reaction.",
+    "whyItWorked": "The voiceover explains why the pan matters while the cooking progresses, giving the viewer a technique alongside the recipe.",
+    "metrics": {
+      "reportedViews": 14100000
+    },
+    "rightsStatus": "derived_machine_transcript_paraphrase"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@player_2_player_2.0/video/7641087267854978335",
+    "platform": "tiktok",
+    "creator": "@player_2_player_2.0",
+    "title": "Follow-along dumbbell workout with minimal gear",
+    "language": "en",
+    "niche": "fitness, follow-along instruction",
+    "hookExcerpt": "Let me show you how to get strong real quick",
+    "hookPattern": "Promise a short follow-along routine and immediately name the equipment required.",
+    "transcriptSummary": "Let me show you how to get strong real quick using only two dumbbells, minor 30s. You can use whatever weight you want. It's only going to take five minutes. We're going to work every major muscle group from head to toe with these dumbbells. Ready? It starts with these hands. I hope you guys are doing great. Tell me where you're from in the comments hit that like button share it with your buddies thousands of people get on with this workout every day because it works it's going to get you a lot stronger than you think a lot quicker than you think it's going to change the way you look it's going to change the way you look, it's going to change the way you feel. We're going to start with 10 standing rows. One, just going to get the back, the biceps, two, the shoulders, three, four, five, six, seven, eight, nine, ten. Overhead press. Also going to get the upper chest and shoulders. One, Nine. Ten.\n\nAlright. Ten squats. I'm going to go wide. Point my toes out just a little. Keep my weight on my heels. Bend at the hips. Bend those knees. One. Two. Three. Four. Five. Six. Seven. 3, 4, 5, 6, 7, 8, 9, and 10. 10 curls. Just going to get the biceps. Those squats got the butt and the quads and the knees. Four, two, three, four, five, six, seven, eight, nine, ten. Now we're going to hold a squat.\n\nBend those knees at about a 90. Keep your weight on your heels. This is going to strengthen your knees. It's going to strengthen your quads, your Achilles. Little by little, day by day, brick by brick, we work on our discipline. Discipline is your ability and willingness to stick to a plan. And I'm showing you a plan that's going to get you strong a lot quicker than you think. All you got to do is apply your discipline. All right. We're going to hold this for about 45 seconds. And then we're going to do floor ups on your feet. Now we're going to hold this for about 45 seconds. And then we're going to do floor ups. On your feet. Now we're going to touch the weights to the floor. Over the head. With a press on your tiptoes. One. Two. Three. Four. Two, three, four, feel that burn, five, we're going to hammer five, four, three, two, one, and",
+    "structureSummary": "Equipment and time promise, early community prompt, exercise-by-exercise demonstrations with rep counts, slower hold with a consistency message, then countdown.",
+    "ctaStyle": "Early spoken prompt to comment, like, and share.",
+    "whyItWorked": "The opening tells viewers what they need before they commit, and audible counts keep a follow-along routine easy to track.",
+    "metrics": {
+      "reportedViews": 455200
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@j.skilllab/video/7681093298341039373",
+    "platform": "tiktok",
+    "creator": "@j.skilllab",
+    "title": "Four Windows shortcuts in under 30 seconds",
+    "language": "hi",
+    "niche": "tech, productivity tools, quick tutorial",
+    "hookExcerpt": "नमबर वन, Windows प्लस Shift प्लस S",
+    "hookPattern": "Start a numbered list with the first actionable tip.",
+    "transcriptSummary": "नमबर वन, Windows प्लस Shift प्लस S प्रेस करते हो तो आप अपने लापटॉप में किसी भी specific part का screenshot ले सकते हो। नमबर दो, Windows प्लस Alt प्लस R प्रेस करते हो तो आप अपने लापटॉप में screen recording कर सकते हो। और नमबर तीन, आपका लापटॉप कभी भी hang हो जाए या screen freeze हो जाए तो Windows प्लस Control प्लस Shift प्लस B को प्रेस कर देना इससे आपका graphic driver reset हो जाता है। नमबर चार, Windows प्लस H प्रेस करते हो तो आपके लापटॉप में voice typing start हो जाती है और आप बोल के भी type कर सकते हो। ऐसे interesting tricks के लिए follow and subscribe कर लो भाई।",
+    "structureSummary": "0–6s screenshot tip; 6–11s recording tip; 11–19s name a familiar frustration and offer a shortcut; 20–25s voice typing; 26s onward follow CTA. Timings are approximate.",
+    "ctaStyle": "Spoken invitation to follow or subscribe for similar tips.",
+    "whyItWorked": "Starting at item one delivers a useful example immediately and sets up a predictable rhythm for the next three.",
+    "metrics": {
+      "reportedViews": 632800
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.instagram.com/p/DfcQY3FBt5T",
+    "platform": "instagram",
+    "creator": "@wacomo",
+    "title": "When productivity systems become procrastination",
+    "language": "en",
+    "niche": "productivity, comedy, personal anecdote",
+    "durationSeconds": 37,
+    "hookExcerpt": "I am severely addicted to organizational systems.",
+    "hookPattern": "Open with a self-deprecating confession that establishes the habit being questioned.",
+    "transcriptSummary": "Paraphrase of the Viral Hooks transcript. The creator admits being drawn to planning systems, realizes they have become a way to avoid work, and gives a specific example: organizing his calendar all day instead of making the video. He ends by joking that a simple task list only works if you do the tasks.",
+    "structureSummary": "Self-deprecating confession, examples of the habit, same-day anecdote as evidence, then a simple answer played as a punchline.",
+    "ctaStyle": "Ends on the joke.",
+    "whyItWorked": "The specific anecdote makes the argument tangible and the anticlimactic answer fits the comic setup.",
+    "metrics": {
+      "reportedViews": 492100
+    },
+    "rightsStatus": "derived_transcript_paraphrase"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@lana.k.social/video/7609036133913152790",
+    "platform": "tiktok",
+    "creator": "@lana.k.social",
+    "title": "Three ways to become a viewer's favorite creator",
+    "language": "en",
+    "niche": "creator education, marketing, talking-head advice",
+    "hookExcerpt": "You're going to become your audience's favorite content creator in 2026",
+    "hookPattern": "Promise a viewer-centered outcome, then specify a short list of practices.",
+    "transcriptSummary": "You're going to become your audience's favorite content creator in 2026 and I'm going to help you do that. I'm going to give you three things that you need to prioritize every single day to get people to fall in love with your corner of the internet because we're all just out here wanting to be liked. Am I right? Maybe I need to go book a therapy session but these are things that I prioritize every single day as a content coach but they're also things that I teach my clients as well and they're super effective. First thing we're going to do is we're going to use our stories very intentionally. You're not just going to share your content to your stories, you're going to see your stories as a separate strategy to your main feed content because your main feed content is to attract new people to your page. Your stories are to build connection with your existing audience. With your stories it's all about intimacy, bringing people into your world, showing them the behind the scenes of your day, your little observations, your stories, your vulnerabilities. next thing we're going to do is going to sound ironic given the title of this video but we're going to stop giving people advice no more three tips for this no more one hack for that instead we're going to root everything in our lived experience here's three things that i wish i knew here's a mistake that i made when i was starting out with this here are my favorite\n\nproducts for this thing because to be honest people don't want tips and advice from you they don't they can get that anywhere else google chat to bt they don't need it from sophia the beauty content creator what they do want from you is your perspective and your discernment and your judgment then we're going to focus on values driven content this is any kind of content that gives your opinion your stances your morals your values and your beliefs you can do this in a storytelling way you can do it as a reaction to something that is maybe trending but you're going to focus on this because when you share how you think and feel and see the world that attract other people who think and feel the same way so your stories build intimacy your lived experience builds trust and then your values drive alignment and all together that is the perfect combination to build almost like a cult like following so use all those things satisfy your need to be universally liked and maybe book a therapy appointment",
+    "structureSummary": "0–21s promise, numbered setup and joke; 22–44s Stories; 45–72s personal experience instead of generic advice; 73–91s values; 92s onward recap and callback.",
+    "ctaStyle": "Encourages viewers to combine all three practices, then ends on a callback.",
+    "whyItWorked": "Each point answers a different audience need, and the callback gives the advice a clear ending.",
+    "metrics": {
+      "reportedViews": 1200000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@kristina.probusiness/video/7626486832120778014",
+    "platform": "tiktok",
+    "creator": "@kristina.probusiness",
+    "title": "Frozen banana business",
+    "language": "en",
+    "niche": "food business",
+    "transcriptSummary": "This girl turned an ordinary banana into a business, and now she earns steadily. She simply takes bananas, freezes them at home, dips them in chocolate, and adds toppings, nuts, cookies, caramel. The cost is only 30-40 cents, and she sells each banana for about $5. They are bought for parties, taken as dessert, and just as a pretty sweet snack. Sometimes the simplest ideas bring in the easiest money. Subscribe. There are even more ideas here that you can earn from.",
+    "hookPattern": "Introduce a surprising business built around an ordinary ingredient.",
+    "structureSummary": "Premise, three-step preparation, claimed cost and sale price, occasions, then subscribe.",
+    "ctaStyle": "Subscribe for more business ideas.",
+    "whyItWorked": "The familiar ingredient makes the business idea easy to explain before the creator introduces the pricing claim.",
+    "metrics": {
+      "reportedViews": 1300000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@simonesanderss/video/7657316619089235231",
+    "platform": "tiktok",
+    "creator": "@simonesanderss",
+    "title": "20-inch hair install and review",
+    "language": "en",
+    "niche": "hair UGC",
+    "transcriptSummary": "every time i'm out and people ask me how i get my hair like this look how good my hair looks y'all and i have to dye my hair i didn't have to do anything to my real hair my real hair is not even this full or long right now but this for me is protective style y'all i wear my flat twist and my braids underneath my wigs and i oil my scalp and that's how i grow my hair and i just put my wigs on and there's just so many natural wigs you can buy that look like real hair i never have bad hair days anymore i'll take a warning getting ready because i literally just throw it on it's glueless it's tight to my head the lace looks good i look good like everybody's happy i just love a wig down 10 out of freaking 10 y'all link this wig down below for y'all get y'all one of these like this is just too freaking fire",
+    "hookPattern": "Start with a question people reportedly ask about the visible result.",
+    "structureSummary": "Result and hair reveal, describe the routine underneath, explain why the wig is fast to put on, praise the fit and lace, then link it.",
+    "ctaStyle": "Points viewers to the product link.",
+    "whyItWorked": "The opening shows the outcome and the routine explains how the creator gets it.",
+    "metrics": {
+      "reportedViews": 3800000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@tajahferjuste/video/7648332773932928270",
+    "platform": "tiktok",
+    "creator": "@tajahferjuste",
+    "title": "Quick half-wig install",
+    "language": "en",
+    "niche": "hair tutorial",
+    "transcriptSummary": "What do you mean? Oh, it's a halfway summer. It's a halfway summer, y'all. What? This hair came out the box like this. Curls, layers, and all. I have this amount of leave out. This is my leave out. That's it. And I know the clips hurt. Trust me, I know. So I just got a wig grip band from Amazon. Threw this on, fixed up my baby hairs. What do you mean I'm ready to go this was all the five minutes I'm probably gonna add some heathless curlers on it tonight what oh my goodness y'all yeah they have made it so easy for us to just keep our hair done. No excuses. Oh, so exciting. Yeah, this is the move this summer. All right, bye.",
+    "hookPattern": "Open with an enthusiastic reaction to the ready-to-wear result.",
+    "structureSummary": "Reveal hair out of the box, show the amount of leave-out, address uncomfortable clips with a wig grip, then show the finished style.",
+    "ctaStyle": "Ends on a casual recommendation.",
+    "whyItWorked": "The practical clip workaround answers an objection before the final reveal.",
+    "metrics": {
+      "reportedViews": 1000000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@huanuo_live/video/7589509215559879967",
+    "platform": "tiktok",
+    "creator": "@huanuo_live",
+    "title": "RGB monitor mount",
+    "language": "en",
+    "niche": "desktop product demo",
+    "transcriptSummary": "I'm going to tell you why, three reasons you need this monitor mount here. It can hold from small to big monitors, it keeps all your cables tucked away within the arm cable management system and you can place this monitor at any given height with a touch of a finger. That's an ultra wide monitor by the way. Now also it goes down or up the pole so you can have it side by side, landscape, vertical or you can stack your monitors within the mount here with a click of a button. You can change the colour, set it into one colour, flashing colours, 14 different lighting settings. You want the most professional mount, it's that one.",
+    "hookPattern": "Promise numbered reasons to use a specific product.",
+    "structureSummary": "Introduce screen-size compatibility and cable routing, demonstrate adjustment and multiple arrangements, then show the lighting modes.",
+    "ctaStyle": "Closes with a product recommendation.",
+    "whyItWorked": "The feature list becomes concrete through screen positions and adjustment examples.",
+    "metrics": {
+      "reportedViews": 1700000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@rodney.owens87/video/7637541548686658830",
+    "platform": "tiktok",
+    "creator": "@rodney.owens87",
+    "title": "Snowflake multi-tool demo",
+    "language": "en",
+    "niche": "tools UGC",
+    "transcriptSummary": "Whoever invented this thing deserves a raise. Are you still twisting away with those free Allen wrenches, wasting time and wrecking your wrist? Toss that junk aside and check this out. This is an 18-in-1 Snowflake multi-tool, the kind EDC fanatics swear by. It's packed with 18 built-in functions, so it basically replaces 18 tools in one. The best part? It's tiny enough to clip right onto your keychain. This compact design alone blows every other multi-tool out of the water. Seriously, it's way sturdier than anything else on the market. It's crazy reliable. Every function locks in tight, so it won't let you down no matter where you take it. Stock is flying off the shelves. Grab one before it's gone.",
+    "hookPattern": "Praise the invention, then name the annoyance it solves.",
+    "structureSummary": "Problem with individual hex keys, multi-tool reveal, portability, robustness claims, then an urgency-based close.",
+    "ctaStyle": "Urgency-based invitation to buy.",
+    "whyItWorked": "The setup gives viewers a specific reason to consider a compact multi-tool.",
+    "metrics": {
+      "reportedViews": 1200000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@itsbobbyfinn/video/7630552802334477582",
+    "platform": "tiktok",
+    "creator": "@itsbobbyfinn",
+    "title": "Past tense of read skit",
+    "language": "en",
+    "niche": "language comedy",
+    "transcriptSummary": "So the past tense of sneeze would be sneezed, which means the past tense of freeze would be freezed. No. What would you think? It would be froze. You'll see how it's because that's why. And if the past tense of match is matched, then the past tense of catch would be catched. No, it would be caught. You'll see how it's because it's not catched. That's why. And if the past tense of make is made, then the past tense of take would be? Tade? No. What would you think? It would be took, you know, so let's take a step back. So if read is the present tense, then the past tense of read would be... Readed? No. What would you think? Raid or road? No. What would you think? Something other than R-E-A-D? No. What would you think? The past tense of read would be read. You know what I'm saying? It's because\n\nthat's why. I hate this class.",
+    "hookPattern": "Invite the viewer to apply a familiar language rule, then spring an exception.",
+    "structureSummary": "Build a rule using sneeze, test freeze, then keep changing the examples until the spelling and pronunciation of read become the joke.",
+    "ctaStyle": "Ends on the exception.",
+    "whyItWorked": "The question-and-answer rhythm lets viewers anticipate each answer before hearing the exception.",
+    "metrics": {
+      "reportedViews": 15900000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@niickjackson/video/7609101614661602573",
+    "platform": "tiktok",
+    "creator": "@niickjackson",
+    "title": "Space events of 2026",
+    "language": "en",
+    "niche": "science education",
+    "transcriptSummary": "We are only a few months into 2026 right now, but the space events that are happening this year are insane. These are some of the craziest space events that are going to be happening this year, but I'm going to tell you them super fast and in order. On February the 28th, which is just about a week away, six planets are all about to line up in the night sky all at one time. This is actually called a planet parade, and literally everybody is going to be able to see it. On March 2nd, going into March 3rd, there's going to be a total lunar eclipse, which is going to be a fully red blood moon that's visible across huge parts of the world. On August the 12th there's going to be a total solar eclipse which is where day turns into night time all across parts of Europe. On that same exact night going into August the 13th the Perseid meteor shower is going to peak worldwide which is one of the most active meteor showers we get to see. On October the 4th Saturn is going to reach its point of opposition which basically means we get the best views because it's the closest to Earth so we get to see the rings really well in November we get to see the Leonids meteor shower which is the most famous meteor shower for the bright fireballs that you get to see in the sky because the meteors are so big and then all the way in December we're going to end the year with another\n\nmassive super moon that everybody's going to be able to see and then we also get the G Geminid meteor shower, which is one of the strongest meteor showers on earth. I'm going to be reminding you before every single one of these, that way you don't get to miss any of them. So make sure you add me if you don't want to miss that.",
+    "hookPattern": "Set a specific year and promise a short list of notable events.",
+    "structureSummary": "Set the expectation, introduce upcoming events one at a time, and explain what makes each worth following.",
+    "ctaStyle": "Closes after the final event.",
+    "whyItWorked": "The calendar frame gives each item a concrete reason to pay attention.",
+    "metrics": {
+      "reportedViews": 3700000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@your.bummy.math.tutor/video/7497735437021220142",
+    "platform": "tiktok",
+    "creator": "@your.bummy.math.tutor",
+    "title": "Algebra rules in one minute",
+    "language": "en",
+    "niche": "math education",
+    "transcriptSummary": "Here's all of algebra in one minute. So first we have a squared times a to the third. Basically when we're multiplying exponents, you have to remember to just add the exponents. So this just becomes a to the fifth power. Now what if we multiply 2a to the fifth times 3 to the a? a is the same as a to the first. Multiply our numbers, 2 times 3, that's going to give us 6. a to the fifth times a to the first, remember we just add them again. 5 plus 1 will give me a to the 6th power. Now, what if it's like this? First, we have to distribute 2 to the 2nd. That's just 2 times 2, which will give me 4. Then, 8 to the 3rd to the 2nd, we're multiplying this time when it's to the power. So, 3 times 2 will give me a to the 6th power. Now, what if when we add? When you add with the same 8 to the second, all you have to do is combine the coefficient. 3 plus 2 will give me 5a to the second. Keep a to the second the same. When you divide, 4 divided by 2 will give me 2. 8 to the second divided by 8 to the first, we subtract. 8 to minus 1 will give me a to the first power. And lastly,\n\nwe have to remember that when anything is set at 0 power, that's just equal to 1. So, this is just the same as 3 times 1, which is my answer of 3.",
+    "hookPattern": "Make a broad lesson feel approachable with a one-minute promise.",
+    "structureSummary": "Use a worked example immediately, state its rule, then repeat with new algebra operations and examples.",
+    "ctaStyle": "Closes with the last worked rule.",
+    "whyItWorked": "Switching between a concrete example and its general rule keeps the explanation easy to follow.",
+    "metrics": {
+      "reportedViews": 2900000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@ashleykmcdonaldd/video/7613961412796353823",
+    "platform": "tiktok",
+    "creator": "@ashleykmcdonaldd",
+    "title": "Dress try-on and fit review",
+    "language": "en",
+    "niche": "fashion UGC",
+    "transcriptSummary": "I have an apron belly. You do not see it in this dress, you guys. Plus, it has stretch right here. It has pockets. It covers my arms. I'm a little self-conscious of my arms, so I like that it covers those. It's not revealing. It's like the super flattering neckline, and it has this really pretty texture to it. Curvy girls dream dress because it just comes in where it needs to come in to make you look slim, yet flows off of all the things you need it to flow off of. So many different colors to choose from. I'm a size 12-14. This is my true size large. I'll link it below.",
+    "hookPattern": "Lead with a personal fit concern and immediately show how the dress sits.",
+    "structureSummary": "State the fit concern, show the silhouette, then point out stretch and pockets as concrete features.",
+    "ctaStyle": "Closes with a recommendation based on fit.",
+    "whyItWorked": "The creator demonstrates the feature that matters to the target viewer before listing extras.",
+    "metrics": {
+      "reportedViews": 5600000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@miie.ko/video/7660656096767495454",
+    "platform": "tiktok",
+    "creator": "@miie.ko",
+    "title": "Curly bundles review",
+    "language": "en",
+    "niche": "hair UGC",
+    "transcriptSummary": "you know i don't get keeps so here's the hair details on these miracle knots that i did this is hair from oq hair we got five bundles of their 20 inch burmese curly straight out the pack the hair was shiny it smelled really good but i did wash the hair and this is how it looked nice and fluffy and soft this texture was amazing but i feel like it looks even better when you wash it this is how it looks fully installed i did all five bundles i see people say they use four bundles but i like five bundles it depends on how you distribute it but this is how it look nice and full it's long it's soft it's lightweight and the best part is it's reusable so people say like it's expensive but you get the quality as long as you take care of it it's quality like y'all see we put the little products on it it's nice and soft and silky so click the orange shopping cart to buy",
+    "hookPattern": "Answer the question viewers are likely to ask about the finished hairstyle.",
+    "structureSummary": "Name the hairstyle and source, describe the bundles and texture, then share the wear experience.",
+    "ctaStyle": "Product details are the payoff.",
+    "whyItWorked": "The finished style gives viewers a reason to listen for specific product details.",
+    "metrics": {
+      "reportedViews": 3200000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@brentstephens88/video/7631595223222734110",
+    "platform": "tiktok",
+    "creator": "@brentstephens88",
+    "title": "Pocket-size emergency charger pitch",
+    "language": "en",
+    "niche": "product pitch",
+    "transcriptSummary": "You throw this away or you can recharge this? Yes, ma'am. That's rechargeable with a USB-C port where your finger's at. And they'll hold charge for a couple years on the shelf. Just like that? A couple of years? Interesting. He created a pocket-sized emergency phone charger that's ready to use any time. And the sharks loved how simple and convenient it was. Is your idea this is a convenience? I'm out at a 7-Eleven or something. I need a charger. I didn't bring my charger. I grab it off the shelf. Yes, sir. Same problem. What do you charge for it? They retail from $12.99 to $19.99. What does it cost you to make one? $3.65 right now, landed. So tell me, if somebody were to put this into their iPhone, how much will it charge? How many hours worth? And how quick? Yes, ma'am. One thing I like to say when people ask me this is they say, how long does it take to charge? Is it rapid charge? And I say, hey, when your phone's dead, it doesn't matter. Yeah, it's a good charge. When you're begging for water in the desert and somebody comes by with a canteen, do you say, is that tap or spark?",
+    "hookPattern": "Open on an audience question that exposes a practical concern.",
+    "structureSummary": "Answer how the charger is reused, explain the port and compatibility, then answer follow-up questions about the product.",
+    "ctaStyle": "The exchange focuses on evaluating the product.",
+    "whyItWorked": "A natural objection gives the presenter a reason to explain the feature in plain language.",
+    "metrics": {
+      "reportedViews": 1400000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@carew_ellington/video/7553732472681401631",
+    "platform": "tiktok",
+    "creator": "@carew_ellington",
+    "title": "Feeling chosen in a relationship",
+    "language": "en",
+    "niche": "personal storytelling",
+    "transcriptSummary": "I knew I loved you the moment I realized I didn't have to fix myself to be loved by you. For so long I carried the weight of trying to earn what could never be earned. But with you, I found a love that doesn't demand I perform. A love that sees me, chooses me, and stays. Through you, God has shown me that his love is not earned but received and that I'm not too broken to be whole. I can't wait to see you as a mother, to watch you nurture God in love with the same grace and strength that first captured my heart. In my heart, I married you a long time ago. And I believe in your heart you married me too. Long before this day, before these vows, before the rings, there was a covenant being written in the quiet, in the prayers, in hope, and in the faith that God was preparing us for each other. Today isn't the start.",
+    "hookPattern": "Lead with the moment the speaker recognized what had changed emotionally.",
+    "structureSummary": "Recognition of acceptance, contrast with the prior pressure to change, then a reflection on feeling loved.",
+    "ctaStyle": "Ends on a personal reflection.",
+    "whyItWorked": "The initial realization gives the personal contrast a clear emotional direction.",
+    "metrics": {
+      "reportedViews": 26400000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  },
+  {
+    "sourceUrl": "https://www.tiktok.com/@niickjackson/video/7625074773273480461",
+    "platform": "tiktok",
+    "creator": "@niickjackson",
+    "title": "Artemis crew flies behind the Moon",
+    "language": "en",
+    "niche": "space education",
+    "transcriptSummary": "Make sure that you do not miss this because this is about to be the biggest part of the entire Artemis mission and the footage that comes back from Monday is going to be absolutely insane. So happening on Monday, the Artemis crew is going to be flying behind the moon and this is everything that is about to happen. They are going to pass 4,700 miles from the far side of the moon, which will officially make them the farthest humans from earth in all of recorded history. During a six hour window they're going to be photographing craters from the far side of the moon that no human being has actually ever been able to see before with their own eyes. NASA has already been planning which exact spots that they're going to be shooting and the crew has been setting up camera lenses all week so they're ready for this moment. Whenever the Artemis crew is behind the moon they are going to be losing all communication with Earth for about 40 minutes. No signal, no mission control, completely alone out there without any communication. And during that blackout, they are going to be seeing a solar eclipse. Earth is going to be crossing in front of the sun from their view, creating a solar eclipse that nobody's ever been able to witness\n\nfrom that angle ever in history. Guys, this is about to be insane. Make sure that you go ahead and add me right now if you're watching this video because I'm going to be showing you every single photo, every single clip, and every single piece of footage the second it comes back. Monday is two days away.",
+    "hookPattern": "Tell viewers why a specific upcoming moment is worth following.",
+    "structureSummary": "Introduce the imminent lunar flyby, explain what the crew can see and document, and frame why that phase of the mission matters.",
+    "ctaStyle": "Invites viewers to pay attention to the upcoming event.",
+    "whyItWorked": "A time-sensitive opening creates a reason to stay for the explanation of the event.",
+    "metrics": {
+      "reportedViews": 4100000
+    },
+    "rightsStatus": "saveto_machine_transcript_unreviewed"
+  }
+]

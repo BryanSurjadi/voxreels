@@ -22,6 +22,11 @@ export const initializeTimeline: RequestHandler = async (request, response) => {
   response.status(201).json({ data: await productionService.initializeTimeline(request.auth!.workspaceId, projectId) });
 };
 
+export const realignTimeline: RequestHandler = async (request, response) => {
+  const { projectId, timelineId } = timelineParamsSchema.parse(request.params);
+  response.json({ data: await productionService.realignTimeline(request.auth!.workspaceId, projectId, timelineId) });
+};
+
 export const updateTimeline: RequestHandler = async (request, response) => {
   const { projectId, timelineId } = timelineParamsSchema.parse(request.params);
   const { items } = updateTimelineSchema.parse(request.body);

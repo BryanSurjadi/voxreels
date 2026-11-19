@@ -2,6 +2,7 @@ import { z } from "zod";
 
 export const voiceGenerationSchema = z.object({
   voiceId: z.string().trim().min(1).max(100).optional(),
+  beatIds: z.array(z.uuid()).min(1).max(12).optional(),
   gender: z.enum(["male", "female"]).default("female"),
   model: z.enum(["eleven_flash_v2_5", "eleven_multilingual_v2"]).default("eleven_flash_v2_5"),
 });

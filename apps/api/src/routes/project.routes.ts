@@ -43,6 +43,7 @@ projectsRouter.get("/:projectId/voice/:mediaId", productionController.voiceMedia
 projectsRouter.get("/:projectId/broll/:mediaId", productionController.brollMedia);
 projectsRouter.post("/:projectId/media", raw({ type: ["image/*", "audio/*", "video/*"], limit: "50mb" }), productionController.uploadMedia);
 projectsRouter.post("/:projectId/timeline", productionController.initializeTimeline);
+projectsRouter.post("/:projectId/timeline/:timelineId/realign", productionController.realignTimeline);
 projectsRouter.patch("/:projectId/timeline/:timelineId", productionController.updateTimeline);
 projectsRouter.post("/:projectId/timeline/:timelineId/items", productionController.addTimelineItem);
 projectsRouter.post("/:projectId/timeline/:timelineId/items/:itemId/split", productionController.splitTimelineItem);

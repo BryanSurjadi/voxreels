@@ -34,13 +34,17 @@ export function createVoiceTake(scriptBeatId: string, model: string, voiceId: st
   });
 }
 
-export function completeVoiceTake(id: string, storageKey: string, providerJobId: string | null) {
-  return prisma.voiceTake.update({ where: { id }, data: { status: "ready", storageKey, providerJobId } });
+export function completeVoiceTake(id: string, storageKey: string, providerJobId: string | null, durationMs: number) {
+  return prisma.voiceTake.update({ where: { id }, data: { status: "ready", storageKey, providerJobId, durationMs } });
 }
 
-export function attachVoiceToTimelines(scriptBeatId: string, voiceTakeId: string) {
+export function setVoiceDuration(id: string, durationMs: number) {
+  return prisma.voiceTake.update({ where: { id }, data: { durationMs } });
+}
+
+export function attachVoiceToTimelines(scriptBeatId: string, voiceTakeId: string, previousVoiceTakeId?: string) {
   return prisma.timelineItem.updateMany({
-    where: { scriptBeatId, trackType: "voice", voiceTakeId: null },
+    where: { scriptBeatId, trackType: "voice", OR: [{ voiceTakeId: null }, ...(previousVoiceTakeId ? [{ voiceTakeId: previousVoiceTakeId }] : [])] },
     data: { voiceTakeId },
   });
 }
@@ -127,6 +131,28 @@ export function updateTimeline(workspaceId: string, projectId: string, timelineI
     await Promise.all(items.map((item) => tx.timelineItem.update({ where: { id: item.id }, data: { startMs: item.startMs, durationMs: item.durationMs, trimStartMs: item.trimStartMs, ...(item.text !== null && { text: item.text }) } })));
     const durationMs = Math.max(1000, ...items.map((item) => item.startMs + item.durationMs));
     return tx.timeline.update({ where: { id: timelineId }, data: { durationMs }, include: { items: { orderBy: [{ trackIndex: "asc" }, { order: "asc" }] } } });
+  });
+}
+
+export function realignGeneratedTimeline(workspaceId: string, projectId: string, timelineId: string, beats: Array<{ id: string; startMs: number; durationMs: number }>) {
+  return prisma.$transaction(async (tx) => {
+    const timeline = await tx.timeline.findFirst({ where: { id: timelineId, projectId, project: { workspaceId } }, include: { items: true } });
+    if (!timeline) return null;
+    const generated = timeline.items.filter((item) => item.scriptBeatId && ["voice", "visual", "text"].includes(item.trackType));
+    if (generated.length !== beats.length * 3 || beats.some((beat) => ["voice", "visual", "text"].some((trackType) => generated.filter((item) => item.scriptBeatId === beat.id && item.trackType === trackType).length !== 1))) return false;
+    for (const beat of beats) {
+      await tx.timelineItem.updateMany({
+        where: { timelineId, scriptBeatId: beat.id, trackType: { in: ["voice", "visual", "text"] } },
+        data: { startMs: beat.startMs, durationMs: beat.durationMs, trimStartMs: 0 },
+      });
+    }
+    const items = await tx.timelineItem.findMany({ where: { timelineId } });
+    const beatStarts = new Map(beats.map((beat) => [beat.id, beat.startMs + beat.durationMs]));
+    return tx.timeline.update({
+      where: { id: timelineId },
+      data: { durationMs: Math.max(1000, ...items.map((item) => item.scriptBeatId && ["voice", "visual", "text"].includes(item.trackType) ? beatStarts.get(item.scriptBeatId)! : item.startMs + item.durationMs)) },
+      include: { items: { orderBy: [{ trackIndex: "asc" }, { order: "asc" }] } },
+    });
   });
 }
 

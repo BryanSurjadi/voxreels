@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import { RoundedPicker } from "@/components/rounded-picker";
 import { apiBlob, apiRequest } from "@/lib/auth";
 
-type VoiceTake = { id: string; status: string; model: string; voiceId: string | null };
+type VoiceTake = { id: string; status: string; model: string; voiceId: string | null; durationMs: number | null };
 type MediaAsset = { id: string; status: string; mimeType: string | null };
 type Beat = {
   id: string;
@@ -22,6 +22,7 @@ type Timeline = { id: string; durationMs: number | null; items: TimelineItem[] }
 type ProductionProject = {
   id: string;
   name: string;
+  targetDurationSeconds: number | null;
   scriptVersions: Array<{ id: string; status: string; beats: Beat[] }>;
   timelines: Timeline[];
 };
@@ -86,6 +87,9 @@ export function ProductionWorkspace({ project, onRefresh, creditsRemaining }: { 
 
   if (!script) return null;
   const voiceCount = beats.filter((beat) => beat.voiceTakes.some((take) => take.status === "ready")).length;
+  const measuredVoiceMs = voiceCount === beats.length && beats.every((beat) => beat.voiceTakes.find((take) => take.status === "ready")?.durationMs)
+    ? beats.reduce((sum, beat) => sum + (beat.voiceTakes.find((take) => take.status === "ready")?.durationMs ?? 0), 0)
+    : null;
   const brollCount = beats.filter((beat) => beat.mediaLinks.some((link) => link.mediaAsset.status === "ready")).length;
   const eligibleBroll = beats.filter((beat) => beat.truthRequirement !== "real_footage_required").length;
   const estimatedBrollCost = selectedBroll.length * 0.01;
@@ -135,6 +139,12 @@ export function ProductionWorkspace({ project, onRefresh, creditsRemaining }: { 
         </article>
       </div>
 
+      {measuredVoiceMs && project.targetDurationSeconds && measuredVoiceMs > project.targetDurationSeconds * 1100 && (
+        <p className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950" role="status">
+          The voiceovers run about {(measuredVoiceMs / 1000).toFixed(1)} seconds, longer than your {project.targetDurationSeconds}-second target. The editor uses the real audio length, so the final video will be longer unless you shorten the edit.
+        </p>
+      )}
+
       <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         {beats.map((beat) => {
           const voice = beat.voiceTakes.find((take) => take.status === "ready");
@@ -155,7 +165,12 @@ export function ProductionWorkspace({ project, onRefresh, creditsRemaining }: { 
                 )}
               </div>
               <p className="mt-3 line-clamp-3 text-sm leading-5">{beat.voiceover}</p>
-              <div className="mt-4 border-t border-zinc-100 pt-4">{voice ? <MediaPreview kind="audio" path={`/projects/${project.id}/voice/${voice.id}`} /> : <p className="text-xs text-zinc-400">Voice not generated</p>}</div>
+              <div className="mt-4 border-t border-zinc-100 pt-4">
+                {voice ? <MediaPreview kind="audio" path={`/projects/${project.id}/voice/${voice.id}`} /> : <p className="text-xs text-zinc-400">Voice not generated</p>}
+                {voice && <button className="mt-2 text-xs font-semibold underline disabled:opacity-40" disabled={Boolean(busy) || creditsRemaining === 0} onClick={() => {
+                  if (window.confirm("Regenerate this beat's voice? This uses 1 generation credit and replaces its audio in the timeline.")) void run("voice", () => apiRequest(`/projects/${project.id}/voice/generate`, { method: "POST", body: JSON.stringify({ gender, beatIds: [beat.id] }) }), "Voice regenerated. Check its timing in the editor.");
+                }}>Regenerate this voice · 1 credit</button>}
+              </div>
               <div className="mt-3">{visual ? <MediaPreview kind="image" path={`/projects/${project.id}/broll/${visual.id}`} /> : <div className="flex aspect-[2/3] items-center justify-center rounded-2xl bg-zinc-100 px-5 text-center text-xs text-zinc-400">{beat.truthRequirement === "real_footage_required" ? "Real footage required" : checked ? "Selected for generation" : "No B-roll selected"}</div>}</div>
             </article>
           );
@@ -171,7 +186,7 @@ export function ProductionWorkspace({ project, onRefresh, creditsRemaining }: { 
 
       <div className="mt-8 rounded-3xl border border-zinc-200 bg-[#efefed] p-5 sm:p-7">
         <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center"><div><b className="text-lg">Edit timeline</b><p className="mt-1 text-sm text-zinc-500">A lightweight cut sheet built from the approved beats.</p></div>{!timeline && <button className="button button-dark" disabled={Boolean(busy)} onClick={() => void run("timeline", () => apiRequest(`/projects/${project.id}/timeline`, { method: "POST" }), "Timeline created.")}>{busy === "timeline" ? "Building…" : "Build edit timeline"}</button>}</div>
-        {timeline && <div className="mt-6 flex flex-col items-start justify-between gap-4 rounded-2xl bg-[#111] p-5 text-white sm:flex-row sm:items-center"><div><p className="font-semibold">Timeline ready</p><p className="mt-1 text-xs text-zinc-400">Generated assets are placed automatically. Upload and arrange your own media in the full editor.</p></div><div className="flex flex-wrap gap-2"><Link className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black" href={`/app/projects/${project.id}/editor`}>Open editor</Link><button className="rounded-full border border-zinc-700 px-5 py-3 text-sm font-semibold" disabled={Boolean(busy)} onClick={() => void downloadExport()}>{busy === "export" ? "Exporting…" : "Export project package"}</button></div></div>}
+        {timeline && <div className="mt-6 flex flex-col items-start justify-between gap-4 rounded-2xl bg-[#111] p-5 text-white sm:flex-row sm:items-center"><div><p className="font-semibold">Timeline ready</p><p className="mt-1 text-xs text-zinc-400">Generated assets are placed automatically. Upload and arrange your own media in the full editor.</p></div><div className="flex flex-wrap gap-2"><Link className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black" href={`/app/projects/${project.id}/editor`}>Open editor</Link><button className="rounded-full border border-zinc-700 px-5 py-3 text-sm font-semibold disabled:opacity-40" disabled={Boolean(busy) || voiceCount !== beats.length} onClick={() => { if (window.confirm("Reset generated voice, visual, and text clips to the actual voice lengths? Uploaded clips stay where they are.")) void run("realign", () => apiRequest(`/projects/${project.id}/timeline/${timeline.id}/realign`, { method: "POST" }), "Generated clips realigned to voice lengths."); }}>{busy === "realign" ? "Realigning…" : "Realign voice timing"}</button><button className="rounded-full border border-zinc-700 px-5 py-3 text-sm font-semibold" disabled={Boolean(busy)} onClick={() => void downloadExport()}>{busy === "export" ? "Exporting…" : "Export project package"}</button></div></div>}
       </div>
       {error && <p className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700" role="alert">{error}</p>}
       {notice && <p className="mt-4 rounded-xl border border-zinc-300 bg-white p-3 text-sm font-medium" role="status">{notice}</p>}
